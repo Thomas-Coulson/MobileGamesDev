@@ -5,15 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.util.concurrent.Callable;
+import android.view.MotionEvent;
 
 public class GameView extends SurfaceView implements Runnable
 {
@@ -24,11 +20,17 @@ public class GameView extends SurfaceView implements Runnable
     private Canvas canvas;
     private long fps;
     private long timeThisFrame;
+    private Bitmap playerSprite;
+
+    private Player player;
 
     public GameView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
+
+        playerSprite = BitmapFactory.decodeResource(getResources(), R.drawable.run);
+        player = new Player(playerSprite);
     }
 
     @Override
@@ -52,6 +54,9 @@ public class GameView extends SurfaceView implements Runnable
     {
         //game update
 
+        //update player
+        player.update(fps, this);
+
     }
 
     public void draw()
@@ -59,7 +64,12 @@ public class GameView extends SurfaceView implements Runnable
         //game draw
         if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
+
+            //currently drawing white background
             canvas.drawColor(Color.WHITE);
+            //draw player
+
+            player.draw(canvas);
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
@@ -79,6 +89,18 @@ public class GameView extends SurfaceView implements Runnable
         playing = true;
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        switch(event.getAction() & MotionEvent.ACTION_MASK)
+        {
+            case MotionEvent.ACTION_DOWN :
+                player.onTouchScreen();
+                break;
+        }
+        return true;
     }
 
 }
