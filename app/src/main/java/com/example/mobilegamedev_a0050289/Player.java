@@ -1,11 +1,10 @@
 package com.example.mobilegamedev_a0050289;
 
-import android.view.SurfaceHolder;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.RectF;
+import android.util.Log;
 
 enum MoveDirection
 {
@@ -20,14 +19,15 @@ public class Player
 {
     private Bitmap playerSprite;
 
-    private int frameW = 115, frameH = 137;
-    private int frameCount = 8;
+    private int frameScale = 2;
+    private int frameW = 60 * frameScale, frameH = 78 * frameScale;
+    private int frameCount = 4;
     private int currentFrame = 0;
     private long lastFrameChangeTime = 0;
     private int frameLengthInMS = 100;
 
     private float xPos = 500, yPos = 500;
-    private float speed = 400; // 250 px/s
+    private float speed = 1000; //px/s
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private RectF whereToDraw = new RectF(xPos, yPos, xPos + frameW, frameH);
 
@@ -40,6 +40,10 @@ public class Player
 
     public void update(float fps, GameView gameView)
     {
+
+        //Log.v("GameViewX", "GameView Width = " + gameView.getWidth());
+        //Log.v("GameViewY", "GameView Height = " + gameView.getHeight());
+
         //always move on update (for now)
         switch(moveDirection)
         {
@@ -107,7 +111,7 @@ public class Player
 
     public void onTouchScreen()
     {
-        moveDirection =MoveDirection.Right;
+        moveDirection =MoveDirection.Down;
     }
 
 

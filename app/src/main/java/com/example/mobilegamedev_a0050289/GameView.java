@@ -29,7 +29,7 @@ public class GameView extends SurfaceView implements Runnable
         Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
 
-        playerSprite = BitmapFactory.decodeResource(getResources(), R.drawable.run);
+        playerSprite = BitmapFactory.decodeResource(getResources(), R.drawable.playerright);
         player = new Player(playerSprite);
     }
 
