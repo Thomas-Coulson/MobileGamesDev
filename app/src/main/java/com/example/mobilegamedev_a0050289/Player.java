@@ -60,15 +60,15 @@ public class Player
                 xPos = xPos + speed / fps;
                 if(xPos > gameView.getWidth())
                 {
-                    xPos = 10;
+                    xPos = -frameW;
                 }
                 break;
             case Down:
                 //move Down
                 yPos = yPos + speed / fps;
-                if(yPos + frameH > gameView.getHeight())
+                if(yPos > gameView.getHeight())
                 {
-                    yPos = 10;
+                    yPos = -frameH;
                 }
                 break;
             case Left:
@@ -86,15 +86,25 @@ public class Player
 
     protected void manageCurrentFrame()
     {
+        //animate sprite
         long time = System.currentTimeMillis();
-        if(time > lastFrameChangeTime + frameLengthInMS)
-        {
-            lastFrameChangeTime = time;
-            currentFrame++;
 
-            if(currentFrame >= frameCount)
+        //Don't Animate if stopped
+        if(moveDirection == MoveDirection.Stopped)
+        {
+            currentFrame = 0;
+        }
+        else
+        {
+            if(time > lastFrameChangeTime + frameLengthInMS)
             {
-                currentFrame = 0;
+                lastFrameChangeTime = time;
+                currentFrame++;
+
+                if(currentFrame >= frameCount)
+                {
+                    currentFrame = 0;
+                }
             }
         }
 
@@ -111,7 +121,14 @@ public class Player
 
     public void onTouchScreen()
     {
-        moveDirection =MoveDirection.Down;
+        if(moveDirection == MoveDirection.Stopped)
+        {
+            moveDirection =MoveDirection.Right;
+        }
+        else
+        {
+            moveDirection = MoveDirection.Stopped;
+        }
     }
 
 
