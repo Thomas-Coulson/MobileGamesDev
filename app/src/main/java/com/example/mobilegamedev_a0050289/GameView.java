@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -21,6 +22,7 @@ public class GameView extends SurfaceView implements Runnable
     private long fps;
     private long timeThisFrame;
     private Bitmap playerSprite;
+    private Bitmap bgSprite;
 
     private Player player;
 
@@ -29,8 +31,11 @@ public class GameView extends SurfaceView implements Runnable
         Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
 
-        playerSprite = BitmapFactory.decodeResource(getResources(), R.drawable.playerright);
+        playerSprite = BitmapFactory.decodeResource(getResources(), R.drawable.testplayer);
         player = new Player(playerSprite);
+
+        bgSprite = BitmapFactory.decodeResource(getResources(), R.drawable.testbg);
+        bgSprite = Bitmap.createScaledBitmap(bgSprite, 1080, 2088, false);
     }
 
     @Override
@@ -65,10 +70,14 @@ public class GameView extends SurfaceView implements Runnable
         if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
 
+            //(Clear bg)
             //currently drawing white background
-            canvas.drawColor(Color.WHITE);
-            //draw player
+            //canvas.drawColor(Color.WHITE);
 
+            //draw test bg
+            canvas.drawBitmap(bgSprite, 0, 0, null);
+
+            //draw player
             player.draw(canvas);
             surfaceHolder.unlockCanvasAndPost(canvas);
         }

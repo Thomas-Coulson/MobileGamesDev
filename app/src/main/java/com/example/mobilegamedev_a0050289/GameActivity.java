@@ -23,9 +23,8 @@ public class GameActivity extends AppCompatActivity {
 
     public void onTouchBack(View view)
     {
-        //move to MainActivity when pressed
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        //move back to MainActivity when pressed
+        finish();
     }
 
     @Override

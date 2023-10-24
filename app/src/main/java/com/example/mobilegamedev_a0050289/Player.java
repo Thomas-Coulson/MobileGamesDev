@@ -19,15 +19,15 @@ public class Player
 {
     private Bitmap playerSprite;
 
-    private int frameScale = 2;
-    private int frameW = 60 * frameScale, frameH = 78 * frameScale;
+   // private double frameScale = 2.25;
+    private int frameW = 135, frameH = 175;
     private int frameCount = 4;
     private int currentFrame = 0;
     private long lastFrameChangeTime = 0;
     private int frameLengthInMS = 100;
 
-    private float xPos = 500, yPos = 500;
-    private float speed = 1000; //px/s
+    private float xPos = 270, yPos = 900;// (+90 from grid pos above) (should really need in actual game)
+    private float speed = 700; //px/s
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private RectF whereToDraw = new RectF(xPos, yPos, xPos + frameW, frameH);
 
@@ -40,11 +40,13 @@ public class Player
 
     public void update(float fps, GameView gameView)
     {
-
-        //Log.v("GameViewX", "GameView Width = " + gameView.getWidth());
-        //Log.v("GameViewY", "GameView Height = " + gameView.getHeight());
-
         //always move on update (for now)
+        if(xPos >= 675)//(test bg purposes)
+        {
+            xPos = 675;
+            moveDirection = MoveDirection.Stopped;
+        }
+
         switch(moveDirection)
         {
             case Up:
