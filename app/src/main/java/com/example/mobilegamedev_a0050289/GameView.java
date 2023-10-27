@@ -26,10 +26,30 @@ public class GameView extends SurfaceView implements Runnable
 
     private Player player;
 
+    private int gridX = 8;
+    private int gridY = 16;
+    private int gridSize = 135;//pixels
+    private GridNode[][] gameGrid = new GridNode[gridY][gridX];// nodes stored [y][x] in array
+
     public GameView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
+
+        //make gameGrid
+        for(int y = 0; y < gridY; y++)
+        {
+            for(int x = 0; x < gridX; x++)
+            {
+                //temp, manually place wall;
+                NodeType nodeType = NodeType.path;
+                if(x == 6  && y == 7)
+                {
+                    nodeType = NodeType.wall;
+                }
+                gameGrid[y][x] = new GridNode(nodeType, gridSize, x * gridSize, y * gridSize);
+            }
+        }
 
         playerSprite = BitmapFactory.decodeResource(getResources(), R.drawable.testplayer);
         player = new Player(playerSprite);
@@ -57,10 +77,31 @@ public class GameView extends SurfaceView implements Runnable
 
     private void update()
     {
-        //game update
-
         //update player
         player.update(fps, this);
+
+        //check level collisions
+        for(int y = 0; y < gridY; y++)
+        {
+            for(int x = 0; x < gridX; x++)
+            {
+                //check player against walls (must be in line to collide)
+                if(gameGrid[y][x].GetNodeType() == NodeType.wall)
+                {
+                    //check player and right wall
+                    Log.v("hitboxTest", "player Bottom = " + player.getHitBox().bottom + ", wall bottom = " + gameGrid[y][x].GetHitBox().bottom);
+                    if(player.getHitBox().right >= gameGrid[y][x].GetHitBox().left
+                    && player.getHitBox().top == gameGrid[y][x].GetHitBox().top
+                    && player.getHitBox().bottom == gameGrid[y][x].GetHitBox().bottom)
+                    {
+                        //player collides with wall
+                        player.setPosition(gameGrid[y][x-1].GetHitBox().left, gameGrid[y-1][x].GetHitBox().top + 95);//yPos = +90 from node above
+                        player.setMoveDirection(MoveDirection.Stopped);
+                    }
+                    //copy above for other directions
+                }
+            }
+        }
 
     }
 

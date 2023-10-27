@@ -26,27 +26,25 @@ public class Player
     private long lastFrameChangeTime = 0;
     private int frameLengthInMS = 100;
 
-    private float xPos = 270, yPos = 900;// (+90 from grid pos above) (should really need in actual game)
+    private float xPos = 270, yPos = 905;//(should use grid pos') (-40 above current node)
     private float speed = 700; //px/s
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
-    private RectF whereToDraw = new RectF(xPos, yPos, xPos + frameW, frameH);
+    private RectF whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
+
+    private int gridSize = 135;
+    private RectF hitBox;
 
     private MoveDirection moveDirection = MoveDirection.Stopped;
 
     public Player(Bitmap sprite)
     {
         playerSprite = Bitmap.createScaledBitmap(sprite, frameW * frameCount, frameH, false);
+        //weird top pos as sprite extends over grid size
+        hitBox = new RectF(xPos, (yPos + frameH) - gridSize, xPos + frameW, yPos + frameH);
     }
 
     public void update(float fps, GameView gameView)
     {
-        //always move on update (for now)
-        if(xPos >= 675)//(test bg purposes)
-        {
-            xPos = 675;
-            moveDirection = MoveDirection.Stopped;
-        }
-
         switch(moveDirection)
         {
             case Up:
@@ -84,6 +82,9 @@ public class Player
             default:
                 break;
         }
+
+        //update player hitbox
+        hitBox.set(xPos, (yPos + frameH) - gridSize, xPos + frameW, yPos + frameH);
     }
 
     protected void manageCurrentFrame()
@@ -120,6 +121,23 @@ public class Player
         manageCurrentFrame();
         canvas.drawBitmap(playerSprite, frameToDraw, whereToDraw, null);
     }
+
+    public void setMoveDirection(MoveDirection moveDir)
+    {
+        moveDirection = moveDir;
+    }
+
+    public void setPosition(int x, int y)
+    {
+        xPos = x;
+        yPos = y;
+    }
+
+    public RectF getHitBox()
+    {
+        return hitBox;
+    }
+
 
     public void onTouchScreen()
     {
