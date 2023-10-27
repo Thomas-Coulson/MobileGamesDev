@@ -21,7 +21,8 @@ public class GameView extends SurfaceView implements Runnable
     private Canvas canvas;
     private long fps;
     private long timeThisFrame;
-    private Bitmap playerSprite;
+    private Bitmap playerSpriteRight;
+    private Bitmap playerSpriteLeft;
     private Bitmap bgSprite;
 
     private Player player;
@@ -47,11 +48,15 @@ public class GameView extends SurfaceView implements Runnable
                 {
                     nodeType = NodeType.wall;
                 }
-                if((x == 2  && y == 6) || (x == 5 && y == 6))//left and right top
+                if((x == 2  && y == 6) || (x == 5 && y == 3))//left and right top
                 {
                     nodeType = NodeType.wall;
                 }
-                if((x == 2  && y ==8) || (x == 5 && y == 8))//left and right bottom
+                if((x == 2  && y == 8) || (x == 5 && y == 8))//left and right bottom
+                {
+                    nodeType = NodeType.wall;
+                }
+                if((x == 4  && y == 4) || (x == 6 && y == 4))//top sides
                 {
                     nodeType = NodeType.wall;
                 }
@@ -59,10 +64,11 @@ public class GameView extends SurfaceView implements Runnable
             }
         }
 
-        playerSprite = BitmapFactory.decodeResource(getResources(), R.drawable.testplayer);
-        player = new Player(playerSprite);
+        playerSpriteRight = BitmapFactory.decodeResource(getResources(), R.drawable.playerright);
+        playerSpriteLeft = BitmapFactory.decodeResource(getResources(), R.drawable.playerleft);
+        player = new Player(playerSpriteRight, playerSpriteLeft);
 
-        bgSprite = BitmapFactory.decodeResource(getResources(), R.drawable.testbg);
+        bgSprite = BitmapFactory.decodeResource(getResources(), R.drawable.testbg2);
         bgSprite = Bitmap.createScaledBitmap(bgSprite, 1080, 2088, false);
     }
 

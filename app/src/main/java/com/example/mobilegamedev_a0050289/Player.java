@@ -17,9 +17,10 @@ enum MoveDirection
 
 public class Player
 {
-    private Bitmap playerSprite;
+    private Bitmap playerSpriteR;
+    private Bitmap playerSpriteL;
+    private Bitmap currentSprite;
 
-   // private double frameScale = 2.25;
     private int frameW = 135, frameH = 175;
     private int frameCount = 4;
     private int currentFrame = 0;
@@ -36,9 +37,11 @@ public class Player
 
     private MoveDirection moveDirection = MoveDirection.Stopped;
 
-    public Player(Bitmap sprite)
+    public Player(Bitmap spriteR, Bitmap spriteL)
     {
-        playerSprite = Bitmap.createScaledBitmap(sprite, frameW * frameCount, frameH, false);
+        playerSpriteR = Bitmap.createScaledBitmap(spriteR, frameW * frameCount, frameH, false);
+        playerSpriteL = Bitmap.createScaledBitmap(spriteL, frameW * frameCount, frameH, false);
+        currentSprite = playerSpriteR;
         //weird top pos as sprite extends over grid size
         hitBox = new RectF(xPos, (yPos + frameH) - gridSize, xPos + frameW, yPos + frameH);
     }
@@ -58,6 +61,7 @@ public class Player
             case Right:
                 //move right
                 xPos = xPos + speed / fps;
+                currentSprite = playerSpriteR;
                 if(xPos > gameView.getWidth())
                 {
                     xPos = -frameW;
@@ -74,6 +78,7 @@ public class Player
             case Left:
                 //move left
                 xPos = xPos - speed / fps;
+                currentSprite = playerSpriteL;
                 if(xPos < 0)
                 {
                     xPos = gameView.getWidth() - frameW;
@@ -119,7 +124,7 @@ public class Player
     {
         whereToDraw.set(xPos, yPos, xPos + frameW, yPos + frameH);
         manageCurrentFrame();
-        canvas.drawBitmap(playerSprite, frameToDraw, whereToDraw, null);
+        canvas.drawBitmap(currentSprite, frameToDraw, whereToDraw, null);
     }
 
     public void setMoveDirection(MoveDirection moveDir)
