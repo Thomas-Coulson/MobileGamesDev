@@ -11,6 +11,10 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.MotionEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class GameView extends SurfaceView implements Runnable
 {
@@ -23,9 +27,11 @@ public class GameView extends SurfaceView implements Runnable
     private long timeThisFrame;
     private Bitmap playerSpriteRight;
     private Bitmap playerSpriteLeft;
-    private Bitmap bgSprite;
+    private Bitmap bgSprite1;
+    private Bitmap bgSprite2;
 
     private Player player;
+    private int currentLevel = 2;
 
     private int gridX = 8;
     private int gridY = 16;
@@ -37,39 +43,82 @@ public class GameView extends SurfaceView implements Runnable
         Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
 
+        //loadLevel will throw an exception if file cannot be read
+        try
+        {
+            loadLevel();
+        }
+        catch(Exception exception)
+        {
+            exception.printStackTrace();;
+        }
+
+        loadSprites();
+
+        player = new Player(playerSpriteRight, playerSpriteLeft);
+    }
+
+    public void loadLevel() throws IOException
+    {
+        //read level from file
+        String string = "";
+        StringBuilder stringbuilder = new StringBuilder();
+        InputStream inputStream= this.getResources().openRawResource(R.raw.testlevel1);
+        if(currentLevel == 2)
+        {
+            inputStream = this.getResources().openRawResource(R.raw.testlevel2);
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        while(true)
+        {
+            try
+            {
+                if((string = reader.readLine()) == null)
+                {
+                    break;
+                }
+            }
+            catch(IOException exception)
+            {
+                exception.printStackTrace();
+            }
+            stringbuilder.append(string).append("");
+        }
+        inputStream.close();
+
+
+        String levelString = string.valueOf(stringbuilder);
+        //Log.v("LevelData", "Loaded Level String = " + levelString);
+
+        int levelStringIndex = 0;
+
         //make gameGrid
         for(int y = 0; y < gridY; y++)
         {
             for(int x = 0; x < gridX; x++)
             {
-                //temp, manually place wall;
+                //Contruct level based on loaded file.
                 NodeType nodeType = NodeType.path;
-                if((x == 1 && y == 7) || (x == 6  && y == 7))//left and right main
-                {
-                    nodeType = NodeType.wall;
-                }
-                if((x == 2  && y == 6) || (x == 5 && y == 3))//left and right top
-                {
-                    nodeType = NodeType.wall;
-                }
-                if((x == 2  && y == 8) || (x == 5 && y == 8))//left and right bottom
-                {
-                    nodeType = NodeType.wall;
-                }
-                if((x == 4  && y == 4) || (x == 6 && y == 4))//top sides
+                if(levelString.charAt(levelStringIndex) == 'X')
                 {
                     nodeType = NodeType.wall;
                 }
                 gameGrid[y][x] = new GridNode(nodeType, gridSize, x * gridSize, y * gridSize);
+                levelStringIndex++;
             }
         }
+    }
 
+    public void loadSprites()
+    {
         playerSpriteRight = BitmapFactory.decodeResource(getResources(), R.drawable.playerright);
         playerSpriteLeft = BitmapFactory.decodeResource(getResources(), R.drawable.playerleft);
-        player = new Player(playerSpriteRight, playerSpriteLeft);
 
-        bgSprite = BitmapFactory.decodeResource(getResources(), R.drawable.testbg2);
-        bgSprite = Bitmap.createScaledBitmap(bgSprite, 1080, 2088, false);
+        bgSprite1 = BitmapFactory.decodeResource(getResources(), R.drawable.testbg);
+        bgSprite1 = Bitmap.createScaledBitmap(bgSprite1, 1080, 2088, false);
+
+        bgSprite2 = BitmapFactory.decodeResource(getResources(), R.drawable.testbg2);
+        bgSprite2 = Bitmap.createScaledBitmap(bgSprite2, 1080, 2088, false);
     }
 
     @Override
@@ -214,7 +263,10 @@ public class GameView extends SurfaceView implements Runnable
 
             //(Clear bg)
             //draw testbg
-            canvas.drawBitmap(bgSprite, 0, 0, null);
+            if(currentLevel == 1)
+                canvas.drawBitmap(bgSprite1, 0, 0, null);
+            else if(currentLevel == 2)
+                canvas.drawBitmap(bgSprite2, 0, 0, null);
 
             //draw player
             player.draw(canvas);
