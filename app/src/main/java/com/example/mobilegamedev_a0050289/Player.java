@@ -133,6 +133,11 @@ public class Player
         yPos = y;
     }
 
+    public MoveDirection getMoveDirection()
+    {
+        return moveDirection;
+    }
+
     public RectF getHitBox()
     {
         return hitBox;

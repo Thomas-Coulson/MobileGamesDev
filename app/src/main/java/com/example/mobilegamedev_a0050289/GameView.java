@@ -43,7 +43,15 @@ public class GameView extends SurfaceView implements Runnable
             {
                 //temp, manually place wall;
                 NodeType nodeType = NodeType.path;
-                if(x == 6  && y == 7)
+                if((x == 1 && y == 7) || (x == 6  && y == 7))//left and right main
+                {
+                    nodeType = NodeType.wall;
+                }
+                if((x == 2  && y == 6) || (x == 5 && y == 6))//left and right top
+                {
+                    nodeType = NodeType.wall;
+                }
+                if((x == 2  && y ==8) || (x == 5 && y == 8))//left and right bottom
                 {
                     nodeType = NodeType.wall;
                 }
@@ -80,6 +88,13 @@ public class GameView extends SurfaceView implements Runnable
         //update player
         player.update(fps, this);
 
+        //update Collisions
+        checkCollisions();
+
+    }
+
+    public void checkCollisions()
+    {
         //check level collisions
         for(int y = 0; y < gridY; y++)
         {
@@ -88,22 +103,102 @@ public class GameView extends SurfaceView implements Runnable
                 //check player against walls (must be in line to collide)
                 if(gameGrid[y][x].GetNodeType() == NodeType.wall)
                 {
-                    //check player and right wall
-                    Log.v("hitboxTest", "player Bottom = " + player.getHitBox().bottom + ", wall bottom = " + gameGrid[y][x].GetHitBox().bottom);
-                    if(player.getHitBox().right >= gameGrid[y][x].GetHitBox().left
-                    && player.getHitBox().top == gameGrid[y][x].GetHitBox().top
-                    && player.getHitBox().bottom == gameGrid[y][x].GetHitBox().bottom)
+                    switch(player.getMoveDirection())
                     {
-                        //player collides with wall
-                        player.setPosition(gameGrid[y][x-1].GetHitBox().left, gameGrid[y-1][x].GetHitBox().top + 95);//yPos = +90 from node above
-                        player.setMoveDirection(MoveDirection.Stopped);
+                        case Right:
+                            //check player and right wall
+                            if(player.getHitBox().right >= gameGrid[y][x].GetHitBox().left
+                                    && player.getHitBox().top == gameGrid[y][x].GetHitBox().top
+                                    && player.getHitBox().bottom == gameGrid[y][x].GetHitBox().bottom
+                                    && player.getHitBox().left < gameGrid[y][x].GetHitBox().right)
+                            {
+                                //player collides with wall
+                                player.setPosition(gameGrid[y][x-1].GetHitBox().left, gameGrid[y-1][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setMoveDirection(MoveDirection.Stopped);
+                                break;//dont need to check other collions once we have stopped
+                            }
+                            break;
+                        case Left:
+                            //check player and left wall
+                            if(player.getHitBox().left <= gameGrid[y][x].GetHitBox().right
+                                    && player.getHitBox().top == gameGrid[y][x].GetHitBox().top
+                                    && player.getHitBox().bottom == gameGrid[y][x].GetHitBox().bottom
+                                    && player.getHitBox().right > gameGrid[y][x].GetHitBox().left)
+                            {
+                                //player collides with wall
+                                player.setPosition(gameGrid[y][x].GetHitBox().right, gameGrid[y-1][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setMoveDirection(MoveDirection.Stopped);
+                                break;//dont need to check other collions once we have stopped
+                            }
+                            break;
+                        case Up:
+                            //check player and left wall
+                            if(player.getHitBox().top <= gameGrid[y][x].GetHitBox().bottom
+                                    && player.getHitBox().right == gameGrid[y][x].GetHitBox().right
+                                    && player.getHitBox().left == gameGrid[y][x].GetHitBox().left
+                                    && player.getHitBox().bottom > gameGrid[y][x].GetHitBox().top)
+                            {
+                                //player collides with wall
+                                player.setPosition(gameGrid[y][x].GetHitBox().left, gameGrid[y][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setMoveDirection(MoveDirection.Stopped);
+                                break;//dont need to check other collions once we have stopped
+                            }
+                            break;
+                        case Down:
+                            //check player and left wall
+                            if(player.getHitBox().bottom >= gameGrid[y][x].GetHitBox().top
+                                    && player.getHitBox().right == gameGrid[y][x].GetHitBox().right
+                                    && player.getHitBox().left == gameGrid[y][x].GetHitBox().left
+                                    && player.getHitBox().top < gameGrid[y][x].GetHitBox().bottom)
+                            {
+                                //player collides with wall
+                                player.setPosition(gameGrid[y][x].GetHitBox().left, gameGrid[y-2][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setMoveDirection(MoveDirection.Stopped);
+                                break;//dont need to check other collions once we have stopped
+                            }
+                            break;
+                        //copy above for other directions
+                        default:
+                            break;
+
                     }
-                    //copy above for other directions
                 }
             }
         }
-
     }
+
+    public void movePlayerRight()
+    {
+        if(player.getMoveDirection() == MoveDirection.Stopped)
+        {
+            player.setMoveDirection(MoveDirection.Right);
+        }
+    }
+
+    public void movePlayerLeft()
+    {
+        if(player.getMoveDirection() == MoveDirection.Stopped)
+        {
+            player.setMoveDirection(MoveDirection.Left);
+        }
+    }
+
+    public void movePlayerUp()
+    {
+        if(player.getMoveDirection() == MoveDirection.Stopped)
+        {
+            player.setMoveDirection(MoveDirection.Up);
+        }
+    }
+
+    public void movePlayerDown()
+    {
+        if(player.getMoveDirection() == MoveDirection.Stopped)
+        {
+            player.setMoveDirection(MoveDirection.Down);
+        }
+    }
+
 
     public void draw()
     {
@@ -112,10 +207,7 @@ public class GameView extends SurfaceView implements Runnable
             canvas = surfaceHolder.lockCanvas();
 
             //(Clear bg)
-            //currently drawing white background
-            //canvas.drawColor(Color.WHITE);
-
-            //draw test bg
+            //draw testbg
             canvas.drawBitmap(bgSprite, 0, 0, null);
 
             //draw player
