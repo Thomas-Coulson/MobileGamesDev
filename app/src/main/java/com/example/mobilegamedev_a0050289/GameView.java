@@ -187,7 +187,7 @@ public class GameView extends SurfaceView implements Runnable
                             }
                             break;
                         case Up:
-                            //check player and left wall
+                            //check player and top wall
                             if(player.getHitBox().top <= gameGrid[y][x].GetHitBox().bottom
                                     && player.getHitBox().right == gameGrid[y][x].GetHitBox().right
                                     && player.getHitBox().left == gameGrid[y][x].GetHitBox().left
@@ -200,7 +200,7 @@ public class GameView extends SurfaceView implements Runnable
                             }
                             break;
                         case Down:
-                            //check player and left wall
+                            //check player and bottom wall
                             if(player.getHitBox().bottom >= gameGrid[y][x].GetHitBox().top
                                     && player.getHitBox().right == gameGrid[y][x].GetHitBox().right
                                     && player.getHitBox().left == gameGrid[y][x].GetHitBox().left
