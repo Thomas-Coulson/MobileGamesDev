@@ -24,9 +24,9 @@ public class MainActivity extends AppCompatActivity {
     public void onTouchStartGame(View view)
     {
         //move to GameActivity when pressed
-        Log.d("onTouchStartGame", "Button Pressed");
+        //Log.d("onTouchStartGame", "Button Pressed");
         Intent intent = new Intent(this, GameActivity.class);
-        Log.d("onTouchStartGame", "Intent made");
+        //Log.d("onTouchStartGame", "Intent made");
         startActivity(intent);
     }
 

@@ -35,4 +35,27 @@
         app:layout_constraintStart_toStartOf="@+id/gameView"
         app:layout_constraintTop_toTopOf="@+id/gameView" />
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:onClick="onTouchEnd"
+        android:text="Game Over"
+        app:layout_constraintEnd_toEndOf="@+id/gameView"
+        app:layout_constraintHorizontal_bias="0.923"
+        app:layout_constraintStart_toEndOf="@+id/backButton"
+        app:layout_constraintTop_toTopOf="@+id/gameView" />
+
+    <Button
+        android:id="@+id/levelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="128dp"
+        android:layout_marginTop="16dp"
+        android:onClick="onTouchLevel"
+        android:text="Toggle Level"
+        app:layout_constraintStart_toStartOf="@+id/gameView"
+        app:layout_constraintTop_toTopOf="@+id/gameView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

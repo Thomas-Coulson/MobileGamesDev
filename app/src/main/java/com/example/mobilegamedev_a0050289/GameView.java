@@ -31,7 +31,11 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap bgSprite2;
 
     private Player player;
-    private int currentLevel = 2;
+    private int playerStartPosX = 270, playerStartPosY = 905;
+    private int currentLevelIndex = 0;
+
+    private Bitmap[] levelBackgrounds = new Bitmap[2];//stores all level images
+    private int[] levelFileIds = new int[2];
 
     private int gridX = 8;
     private int gridY = 16;
@@ -42,6 +46,10 @@ public class GameView extends SurfaceView implements Runnable
         super(context, attributeSet);
         Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
+
+        //save levelFileIds
+        levelFileIds[0] = R.raw.testlevel1;
+        levelFileIds[1] = R.raw.testlevel2;
 
         //loadLevel will throw an exception if file cannot be read
         try
@@ -63,11 +71,7 @@ public class GameView extends SurfaceView implements Runnable
         //read level from file
         String string = "";
         StringBuilder stringbuilder = new StringBuilder();
-        InputStream inputStream= this.getResources().openRawResource(R.raw.testlevel1);
-        if(currentLevel == 2)
-        {
-            inputStream = this.getResources().openRawResource(R.raw.testlevel2);
-        }
+        InputStream inputStream = this.getResources().openRawResource(levelFileIds[currentLevelIndex]);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         while(true)
         {
@@ -88,7 +92,6 @@ public class GameView extends SurfaceView implements Runnable
 
 
         String levelString = string.valueOf(stringbuilder);
-        //Log.v("LevelData", "Loaded Level String = " + levelString);
 
         int levelStringIndex = 0;
 
@@ -98,11 +101,16 @@ public class GameView extends SurfaceView implements Runnable
             for(int x = 0; x < gridX; x++)
             {
                 //Contruct level based on loaded file.
-                NodeType nodeType = NodeType.path;
+                NodeType nodeType = NodeType.none;
                 if(levelString.charAt(levelStringIndex) == 'X')
                 {
                     nodeType = NodeType.wall;
                 }
+                else
+                {
+                    nodeType = NodeType.none;
+                }
+
                 gameGrid[y][x] = new GridNode(nodeType, gridSize, x * gridSize, y * gridSize);
                 levelStringIndex++;
             }
@@ -116,9 +124,12 @@ public class GameView extends SurfaceView implements Runnable
 
         bgSprite1 = BitmapFactory.decodeResource(getResources(), R.drawable.testbg);
         bgSprite1 = Bitmap.createScaledBitmap(bgSprite1, 1080, 2088, false);
+        levelBackgrounds[0] = bgSprite1;
 
         bgSprite2 = BitmapFactory.decodeResource(getResources(), R.drawable.testbg2);
         bgSprite2 = Bitmap.createScaledBitmap(bgSprite2, 1080, 2088, false);
+        levelBackgrounds[1] = bgSprite2;
+
     }
 
     @Override
@@ -263,10 +274,7 @@ public class GameView extends SurfaceView implements Runnable
 
             //(Clear bg)
             //draw testbg
-            if(currentLevel == 1)
-                canvas.drawBitmap(bgSprite1, 0, 0, null);
-            else if(currentLevel == 2)
-                canvas.drawBitmap(bgSprite2, 0, 0, null);
+            canvas.drawBitmap(levelBackgrounds[currentLevelIndex], 0, 0, null);
 
             //draw player
             player.draw(canvas);
@@ -289,6 +297,26 @@ public class GameView extends SurfaceView implements Runnable
         playing = true;
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    public void toggleLevel()
+    {
+        //manually set for testing
+        if(currentLevelIndex == 0)
+            currentLevelIndex = 1;
+        else if(currentLevelIndex == 1)
+            currentLevelIndex = 0;
+
+        try
+        {
+            loadLevel();
+        }
+        catch(Exception exception)
+        {
+            exception.printStackTrace();;
+        }
+
+        player.setPosition(playerStartPosX, playerStartPosY);
     }
 
     @Override

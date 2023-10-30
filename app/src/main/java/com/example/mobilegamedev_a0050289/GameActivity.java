@@ -39,11 +39,23 @@ public class GameActivity extends AppCompatActivity {
         backButton.setOnClickListener(this::onTouchBack);
     }
 
-
     public void onTouchBack(View view)
     {
         //move back to MainActivity when pressed
         finish();
+    }
+
+    public void onTouchEnd(View view)
+    {
+        //cycle game
+        Intent intent = new Intent(this, EndScreenActivity.class);
+        startActivity(intent);
+    }
+
+    public void onTouchLevel(View view)
+    {
+        //cycle game
+        gameView.toggleLevel();
     }
 
     @Override
