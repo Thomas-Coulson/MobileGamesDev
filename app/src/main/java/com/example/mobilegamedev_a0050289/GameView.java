@@ -31,12 +31,13 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap bgSprite2;
 
     private Player player;
-    private int playerStartPosX = 270, playerStartPosY = 905;
+    private int playerStartPosX = 180, playerStartPosY = 140;
     private int currentLevelIndex = 0;
 
-    private Bitmap[] levelBackgrounds = new Bitmap[1];//stores all level images
-    private int[] levelFileIds = new int[1];
+    private Bitmap[] levelBackgrounds = new Bitmap[2];//stores all level images
+    private int[] levelFileIds = new int[2];
 
+    private int screenWidth = 720, screenHeight = 1612;
     private int gridX = 8;
     private int gridY = 18;
     private int gridSize = 90;//pixels
@@ -49,7 +50,7 @@ public class GameView extends SurfaceView implements Runnable
 
         //save levelFileIds
         levelFileIds[0] = R.raw.level1;
-        //levelFileIds[1] = R.raw.testlevel2;
+        levelFileIds[1] = R.raw.level2;
 
         //loadLevel will throw an exception if file cannot be read
         try
@@ -123,8 +124,12 @@ public class GameView extends SurfaceView implements Runnable
         playerSpriteLeft = BitmapFactory.decodeResource(getResources(), R.drawable.playerleft);
 
         bgSprite1 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg1);
-        bgSprite1 = Bitmap.createScaledBitmap(bgSprite1, 720, 1612, false);
+        bgSprite1 = Bitmap.createScaledBitmap(bgSprite1, screenWidth, screenHeight, false);
         levelBackgrounds[0] = bgSprite1;
+
+        bgSprite2 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg2);
+        bgSprite2 = Bitmap.createScaledBitmap(bgSprite2, screenWidth, screenHeight, false);
+        levelBackgrounds[1] = bgSprite2;
 
     }
 
@@ -149,6 +154,11 @@ public class GameView extends SurfaceView implements Runnable
     {
         //update player
         player.update(fps, this);
+
+        if(player.GetPositionY() > screenHeight)
+        {
+            loadNextLevel();
+        }
 
         //update Collisions
         checkCollisions();
@@ -295,24 +305,25 @@ public class GameView extends SurfaceView implements Runnable
         gameThread.start();
     }
 
-    public void toggleLevel()
+    public void loadNextLevel()
     {
-        //manually set for testing
-//        if(currentLevelIndex == 0)
-//            currentLevelIndex = 1;
-//        else if(currentLevelIndex == 1)
-//            currentLevelIndex = 0;
-//
-//        try
-//        {
-//            loadLevel();
-//        }
-//        catch(Exception exception)
-//        {
-//            exception.printStackTrace();;
-//        }
-//
-//        player.setPosition(playerStartPosX, playerStartPosY);
+        //Increase level index (cycle round when at end of list)
+        if(currentLevelIndex >= levelFileIds.length - 1)
+            currentLevelIndex = 0;
+        else
+            currentLevelIndex++;
+
+        //load next level
+        try
+        {
+            loadLevel();
+        }
+        catch(Exception exception)
+        {
+            exception.printStackTrace();;
+        }
+
+        player.setPosition(playerStartPosX, playerStartPosY);
     }
 
     @Override

@@ -48,15 +48,12 @@ public class Player
 
     public void update(float fps, GameView gameView)
     {
+        //(only allow off edge cycling in horizontal directions)
         switch(moveDirection)
         {
             case Up:
                 //move up
                 yPos = yPos - speed / fps;
-                if(yPos < 0)
-                {
-                    yPos = gameView.getHeight() - frameH;
-                }
                 break;
             case Right:
                 //move right
@@ -70,10 +67,6 @@ public class Player
             case Down:
                 //move Down
                 yPos = yPos + speed / fps;
-                if(yPos > gameView.getHeight())
-                {
-                    yPos = -frameH;
-                }
                 break;
             case Left:
                 //move left
@@ -137,6 +130,9 @@ public class Player
         xPos = x;
         yPos = y;
     }
+
+    public float GetPositionX() { return xPos; }
+    public float GetPositionY() { return yPos; }
 
     public MoveDirection getMoveDirection()
     {

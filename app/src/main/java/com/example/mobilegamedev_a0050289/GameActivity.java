@@ -55,12 +55,6 @@ public class GameActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void onTouchLevel(View view)
-    {
-        //cycle game
-        gameView.toggleLevel();
-    }
-
     @Override
     protected void onResume()
     {
