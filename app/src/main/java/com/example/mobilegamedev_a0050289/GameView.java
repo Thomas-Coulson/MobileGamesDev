@@ -34,22 +34,22 @@ public class GameView extends SurfaceView implements Runnable
     private int playerStartPosX = 270, playerStartPosY = 905;
     private int currentLevelIndex = 0;
 
-    private Bitmap[] levelBackgrounds = new Bitmap[2];//stores all level images
-    private int[] levelFileIds = new int[2];
+    private Bitmap[] levelBackgrounds = new Bitmap[1];//stores all level images
+    private int[] levelFileIds = new int[1];
 
     private int gridX = 8;
-    private int gridY = 16;
-    private int gridSize = 135;//pixels
+    private int gridY = 18;
+    private int gridSize = 90;//pixels
     private GridNode[][] gameGrid = new GridNode[gridY][gridX];// nodes stored [y][x] in array
 
     public GameView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        Log.d("GameView", "Constructor");
+        //Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
 
         //save levelFileIds
-        levelFileIds[0] = R.raw.testlevel1;
-        levelFileIds[1] = R.raw.testlevel2;
+        levelFileIds[0] = R.raw.level1;
+        //levelFileIds[1] = R.raw.testlevel2;
 
         //loadLevel will throw an exception if file cannot be read
         try
@@ -122,13 +122,9 @@ public class GameView extends SurfaceView implements Runnable
         playerSpriteRight = BitmapFactory.decodeResource(getResources(), R.drawable.playerright);
         playerSpriteLeft = BitmapFactory.decodeResource(getResources(), R.drawable.playerleft);
 
-        bgSprite1 = BitmapFactory.decodeResource(getResources(), R.drawable.testbg);
-        bgSprite1 = Bitmap.createScaledBitmap(bgSprite1, 1080, 2088, false);
+        bgSprite1 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg1);
+        bgSprite1 = Bitmap.createScaledBitmap(bgSprite1, 720, 1612, false);
         levelBackgrounds[0] = bgSprite1;
-
-        bgSprite2 = BitmapFactory.decodeResource(getResources(), R.drawable.testbg2);
-        bgSprite2 = Bitmap.createScaledBitmap(bgSprite2, 1080, 2088, false);
-        levelBackgrounds[1] = bgSprite2;
 
     }
 
@@ -179,7 +175,7 @@ public class GameView extends SurfaceView implements Runnable
                                     && player.getHitBox().left < gameGrid[y][x].GetHitBox().right)
                             {
                                 //player collides with wall
-                                player.setPosition(gameGrid[y][x-1].GetHitBox().left, gameGrid[y-1][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setPosition(gameGrid[y][x-1].GetHitBox().left, gameGrid[y-1][x].GetHitBox().top + 50);//yPos = +95 from node above
                                 player.setMoveDirection(MoveDirection.Stopped);
                                 break;//dont need to check other collions once we have stopped
                             }
@@ -192,7 +188,7 @@ public class GameView extends SurfaceView implements Runnable
                                     && player.getHitBox().right > gameGrid[y][x].GetHitBox().left)
                             {
                                 //player collides with wall
-                                player.setPosition(gameGrid[y][x].GetHitBox().right, gameGrid[y-1][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setPosition(gameGrid[y][x].GetHitBox().right, gameGrid[y-1][x].GetHitBox().top + 50);//yPos = +95 from node above
                                 player.setMoveDirection(MoveDirection.Stopped);
                                 break;//dont need to check other collions once we have stopped
                             }
@@ -205,7 +201,7 @@ public class GameView extends SurfaceView implements Runnable
                                     && player.getHitBox().bottom > gameGrid[y][x].GetHitBox().top)
                             {
                                 //player collides with wall
-                                player.setPosition(gameGrid[y][x].GetHitBox().left, gameGrid[y][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setPosition(gameGrid[y][x].GetHitBox().left, gameGrid[y][x].GetHitBox().top + 50);//yPos = +95 from node above
                                 player.setMoveDirection(MoveDirection.Stopped);
                                 break;//dont need to check other collions once we have stopped
                             }
@@ -218,7 +214,7 @@ public class GameView extends SurfaceView implements Runnable
                                     && player.getHitBox().top < gameGrid[y][x].GetHitBox().bottom)
                             {
                                 //player collides with wall
-                                player.setPosition(gameGrid[y][x].GetHitBox().left, gameGrid[y-2][x].GetHitBox().top + 95);//yPos = +95 from node above
+                                player.setPosition(gameGrid[y][x].GetHitBox().left, gameGrid[y-2][x].GetHitBox().top + 50);//yPos = +95 from node above
                                 player.setMoveDirection(MoveDirection.Stopped);
                                 break;//dont need to check other collions once we have stopped
                             }
@@ -302,21 +298,21 @@ public class GameView extends SurfaceView implements Runnable
     public void toggleLevel()
     {
         //manually set for testing
-        if(currentLevelIndex == 0)
-            currentLevelIndex = 1;
-        else if(currentLevelIndex == 1)
-            currentLevelIndex = 0;
-
-        try
-        {
-            loadLevel();
-        }
-        catch(Exception exception)
-        {
-            exception.printStackTrace();;
-        }
-
-        player.setPosition(playerStartPosX, playerStartPosY);
+//        if(currentLevelIndex == 0)
+//            currentLevelIndex = 1;
+//        else if(currentLevelIndex == 1)
+//            currentLevelIndex = 0;
+//
+//        try
+//        {
+//            loadLevel();
+//        }
+//        catch(Exception exception)
+//        {
+//            exception.printStackTrace();;
+//        }
+//
+//        player.setPosition(playerStartPosX, playerStartPosY);
     }
 
     @Override

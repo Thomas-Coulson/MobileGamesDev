@@ -2,6 +2,7 @@ package com.example.mobilegamedev_a0050289;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -37,6 +38,8 @@ public class GameActivity extends AppCompatActivity {
 
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(this::onTouchBack);
+
+        Log.v("WindowSize", "WindowSize = " + gameView.getWidth() + "," + gameView.getHeight());
     }
 
     public void onTouchBack(View view)

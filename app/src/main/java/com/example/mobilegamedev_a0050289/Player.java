@@ -21,18 +21,18 @@ public class Player
     private Bitmap playerSpriteL;
     private Bitmap currentSprite;
 
-    private int frameW = 135, frameH = 175;
+    private int frameW = 90, frameH = 130;
     private int frameCount = 4;
     private int currentFrame = 0;
     private long lastFrameChangeTime = 0;
     private int frameLengthInMS = 100;
 
-    private float xPos = 270, yPos = 905;//(should use grid pos') (-40 above current node)
+    private float xPos = 180, yPos = 140;//(should use grid pos') (-40 above current node)
     private float speed = 700; //px/s
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private RectF whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
 
-    private int gridSize = 135;
+    private int gridSize = 90;
     private RectF hitBox;
 
     private MoveDirection moveDirection = MoveDirection.Stopped;
