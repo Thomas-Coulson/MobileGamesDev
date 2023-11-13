@@ -30,12 +30,20 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap bgSprite1;
     private Bitmap bgSprite2;
 
+    private Bitmap coinSprite;
+    private int coinX = 0;
+    private int coinY = 0;
+    private int totalCoins = 0;
+
     private Player player;
     private int playerStartPosX = 180, playerStartPosY = 140;
     private int currentLevelIndex = 0;
 
     private Bitmap[] levelBackgrounds = new Bitmap[2];//stores all level images
     private int[] levelFileIds = new int[2];
+
+    //max of 5 coins per level
+    private Coin[] levelCoins = new Coin[5];
 
     private int screenWidth = 720, screenHeight = 1612;
     private int gridX = 8;
@@ -52,6 +60,8 @@ public class GameView extends SurfaceView implements Runnable
         levelFileIds[0] = R.raw.level1;
         levelFileIds[1] = R.raw.level2;
 
+        loadSprites();
+
         //loadLevel will throw an exception if file cannot be read
         try
         {
@@ -62,13 +72,16 @@ public class GameView extends SurfaceView implements Runnable
             exception.printStackTrace();;
         }
 
-        loadSprites();
-
         player = new Player(playerSpriteRight, playerSpriteLeft);
     }
 
     public void loadLevel() throws IOException
     {
+        for(int i = 0; i < 5; i++)
+        {
+            levelCoins[i] = new Coin(0, 0, coinSprite);
+        }
+
         //read level from file
         String string = "";
         StringBuilder stringbuilder = new StringBuilder();
@@ -107,9 +120,22 @@ public class GameView extends SurfaceView implements Runnable
                 {
                     nodeType = NodeType.wall;
                 }
-                else
+                else if(levelString.charAt(levelStringIndex) == 'C')
                 {
-                    nodeType = NodeType.none;
+                    nodeType = NodeType.coin;
+                    Log.v("Coins", "Checking though level coins");
+                    for(int i = 0; i < 5; i++)
+                    {
+                        Log.v("Coins", "Checking available coins");
+                        if(!levelCoins[i].GetVisible())
+                        {
+                            Log.v("Coins", "Visible coin index = " + i);
+                            levelCoins[i].SetNewPosition(x * gridSize, y * gridSize);
+                            levelCoins[i].SetVisible(true);
+                            break;
+                        }
+
+                    }
                 }
 
                 gameGrid[y][x] = new GridNode(nodeType, gridSize, x * gridSize, y * gridSize);
@@ -130,6 +156,8 @@ public class GameView extends SurfaceView implements Runnable
         bgSprite2 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg2);
         bgSprite2 = Bitmap.createScaledBitmap(bgSprite2, screenWidth, screenHeight, false);
         levelBackgrounds[1] = bgSprite2;
+
+        coinSprite = BitmapFactory.decodeResource(getResources(), R.drawable.coin);
 
     }
 
@@ -229,14 +257,80 @@ public class GameView extends SurfaceView implements Runnable
                                 break;//dont need to check other collions once we have stopped
                             }
                             break;
-                        //copy above for other directions
                         default:
                             break;
-
                     }
                 }
             }
         }
+
+        //check all coins against player
+        for(int i = 0; i < 5; i++)
+        {
+            if(levelCoins[i].GetVisible())
+            {
+                switch(player.getMoveDirection())
+                {
+                    case Right:
+                        //check player and right wall
+                        if(player.getHitBox().right >= levelCoins[i].GetHitBox().left
+                                && player.getHitBox().top == levelCoins[i].GetHitBox().top
+                                && player.getHitBox().bottom == levelCoins[i].GetHitBox().bottom
+                                && player.getHitBox().left < levelCoins[i].GetHitBox().right)
+                        {
+                            //player picks up coin
+                            levelCoins[i].SetVisible(false);
+                            totalCoins++;
+                            break;
+                        }
+                        break;
+                    case Left:
+                        //check player and left wall
+                        if(player.getHitBox().left <= levelCoins[i].GetHitBox().right
+                                && player.getHitBox().top == levelCoins[i].GetHitBox().top
+                                && player.getHitBox().bottom == levelCoins[i].GetHitBox().bottom
+                                && player.getHitBox().right > levelCoins[i].GetHitBox().left)
+                        {
+                            //player picks up coin
+                            levelCoins[i].SetVisible(false);
+                            totalCoins++;
+                            break;
+                        }
+                        break;
+                    case Up:
+                        //check player and top wall
+                        if(player.getHitBox().top <= levelCoins[i].GetHitBox().bottom
+                                && player.getHitBox().right == levelCoins[i].GetHitBox().right
+                                && player.getHitBox().left == levelCoins[i].GetHitBox().left
+                                && player.getHitBox().bottom > levelCoins[i].GetHitBox().top)
+                        {
+                            //player picks up coin
+                            levelCoins[i].SetVisible(false);
+                            totalCoins++;
+                            break;
+                        }
+                        break;
+                    case Down:
+                        //check player and bottom wall
+                        if(player.getHitBox().bottom >= levelCoins[i].GetHitBox().top
+                                && player.getHitBox().right == levelCoins[i].GetHitBox().right
+                                && player.getHitBox().left == levelCoins[i].GetHitBox().left
+                                && player.getHitBox().top < levelCoins[i].GetHitBox().bottom)
+                        {
+                            //player picks up coin
+                            levelCoins[i].SetVisible(false);
+                            totalCoins++;
+                            break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+
+
     }
 
     public void movePlayerRight()
@@ -282,9 +376,17 @@ public class GameView extends SurfaceView implements Runnable
             //draw testbg
             canvas.drawBitmap(levelBackgrounds[currentLevelIndex], 0, 0, null);
 
+            //draw coins
+            for(int i = 0; i < 5; i++)
+            {
+                levelCoins[i].draw(canvas);
+            }
+
             //draw player
             player.draw(canvas);
+
             surfaceHolder.unlockCanvasAndPost(canvas);
+
         }
     }
 

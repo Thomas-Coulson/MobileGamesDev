@@ -12,7 +12,7 @@ enum NodeType
 
 public class GridNode
 {
-    private NodeType m_nodeType;
+    private NodeType m_nodeType = NodeType.none;
     private int m_size;
     private int m_xPos = 0, m_yPos = 0;
     private Rect m_hitBox;
