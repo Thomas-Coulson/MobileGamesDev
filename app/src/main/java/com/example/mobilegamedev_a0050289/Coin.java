@@ -9,26 +9,57 @@ import android.util.Log;
 
 public class Coin {
 
-    private Bitmap sprite;
-    private int frameW = 90, frameH = 90;
     //private boolean pickedUp = false;
     private boolean visible = false;
     private int xPos = 0, yPos = 0;
+
+    private Bitmap sprite;
+    private int frameW = 90, frameH = 90;
+    private int frameCount = 4;
+    private int currentFrame = 0;
+    private long lastFrameChangeTime = 0;
+    private int frameLengthInMS = 100;
+    private Rect frameToDraw = new Rect(0,0,frameW,frameH);
+    private RectF whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
+
     private RectF Hitbox = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
 
     public Coin(int xpos, int ypos, Bitmap coinSprite)
     {
-        sprite = Bitmap.createScaledBitmap(coinSprite, frameW, frameH, false);
+        sprite = Bitmap.createScaledBitmap(coinSprite, frameW * frameCount, frameH, false);
         xPos = xpos;
         yPos = ypos;
         Hitbox = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
     }
 
+    protected void manageCurrentFrame()
+    {
+        //animate sprite
+        long time = System.currentTimeMillis();
+
+        if(time > lastFrameChangeTime + frameLengthInMS)
+        {
+            lastFrameChangeTime = time;
+            currentFrame++;
+
+            if(currentFrame >= frameCount)
+            {
+                currentFrame = 0;
+            }
+        }
+
+        frameToDraw.left = currentFrame * frameW;
+        frameToDraw.right = frameToDraw.left + frameW;
+    }
+
     public void draw(Canvas canvas)
     {
+
         if(visible)
         {
-            canvas.drawBitmap(sprite, xPos, yPos, null);
+            whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
+            manageCurrentFrame();
+            canvas.drawBitmap(sprite, frameToDraw, whereToDraw, null);
         }
 
     }
