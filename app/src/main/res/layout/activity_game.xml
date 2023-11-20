@@ -12,50 +12,22 @@
         android:layout_height="fill_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/CoinCount"
         android:layout_width="144dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="280dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="TextView"
+        android:layout_marginEnd="16dp"
+        android:text="Coins: 0"
+        android:textColor="#FFFFFF"
         android:textSize="34sp"
-        app:layout_constraintStart_toStartOf="@+id/gameView"
-        app:layout_constraintTop_toTopOf="@+id/gameView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="928dp"
-        android:alpha="255"
-        android:backgroundTint="#838383"
-        android:fontFamily="sans-serif"
-        android:onClick="onTouchBack"
-        android:text="Back"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        android:typeface="normal"
-        app:layout_constraintStart_toStartOf="@+id/gameView"
-        app:layout_constraintTop_toTopOf="@+id/gameView" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="928dp"
-        android:onClick="onTouchEnd"
-        android:text="Game Over"
-        app:layout_constraintEnd_toEndOf="@+id/gameView"
-        app:layout_constraintHorizontal_bias="0.927"
-        app:layout_constraintStart_toEndOf="@+id/backButton"
-        app:layout_constraintTop_toTopOf="@+id/gameView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

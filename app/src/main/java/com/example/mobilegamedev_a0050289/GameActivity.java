@@ -5,21 +5,27 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class GameActivity extends AppCompatActivity {
     GameView gameView;
-    Button backButton;
+    //Button backButton;
+    public TextView coinText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        coinText = findViewById(R.id.CoinCount);
+
         //set gameview, and the swipe listner
         gameView = findViewById(R.id.gameView);
+        //gameView.setActivity(this);
+        gameView.setCoinText(coinText);
         gameView.setOnTouchListener(new OnSwipeTouchListener(GameActivity.this)
         {
             public void onSwipeTop() {
@@ -36,11 +42,14 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-        backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(this::onTouchBack);
+        //backButton = findViewById(R.id.backButton);
+        //backButton.setOnClickListener(this::onTouchBack);
 
-        Log.v("WindowSize", "WindowSize = " + gameView.getWidth() + "," + gameView.getHeight());
+
+
+        //Log.v("WindowSize", "WindowSize = " + gameView.getWidth() + "," + gameView.getHeight());
     }
+
 
     public void onTouchBack(View view)
     {

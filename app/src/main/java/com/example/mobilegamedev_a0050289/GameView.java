@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.MotionEvent;
+import android.widget.TextView;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -166,22 +168,46 @@ public class GameView extends SurfaceView implements Runnable
     {
         while(playing)
         {
-            //game loop
-            long startFrameTime = System.currentTimeMillis();
-            update();
-            draw();
-            timeThisFrame = System.currentTimeMillis() - startFrameTime;
-            if(timeThisFrame >= 1)
+            if(playerCoinText != null)
             {
-                fps = 1000 / timeThisFrame;
+                //game loop
+                long startFrameTime = System.currentTimeMillis();
+                update();
+                draw();
+                timeThisFrame = System.currentTimeMillis() - startFrameTime;
+                if (timeThisFrame >= 1) {
+                    fps = 1000 / timeThisFrame;
+                }
             }
         }
+    }
+
+    GameActivity gameActivity;
+    private boolean threadCheck = false;
+    public void setActivity(GameActivity gameActivity)
+    {
+        this.gameActivity = gameActivity;
+//        if(gameActivity.coinText != null)
+//        {
+//            threadCheck = true;
+//        }
+    }
+
+    TextView playerCoinText;//WHY DOES NONE OF THIS WORK
+    public void setCoinText(TextView coinText)
+    {
+        playerCoinText = coinText;
     }
 
     private void update()
     {
         //update player
         player.update(fps, this);
+
+        if(playerCoinText != null)
+        {
+            playerCoinText.setText("Coins: " + String.valueOf(totalCoins));
+        }
 
         if(player.GetPositionY() > screenHeight)
         {
@@ -365,6 +391,7 @@ public class GameView extends SurfaceView implements Runnable
         }
     }
 
+    public int getPlayerCoins(){return totalCoins;}
 
     public void draw()
     {
