@@ -13,19 +13,19 @@ import androidx.appcompat.app.AppCompatActivity;
 public class GameActivity extends AppCompatActivity {
     GameView gameView;
     //Button backButton;
-    public TextView coinText;
+    //public TextView coinText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        coinText = findViewById(R.id.CoinCount);
+        //coinText = findViewById(R.id.CoinCount);
 
         //set gameview, and the swipe listner
         gameView = findViewById(R.id.gameView);
         //gameView.setActivity(this);
-        gameView.setCoinText(coinText);
+        //gameView.setCoinText(coinText);
         gameView.setOnTouchListener(new OnSwipeTouchListener(GameActivity.this)
         {
             public void onSwipeTop() {

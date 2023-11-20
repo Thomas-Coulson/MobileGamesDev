@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
+import java.util.Timer;
 
 public class GameView extends SurfaceView implements Runnable
 {
@@ -35,7 +38,10 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap coinSprite;
     private int coinX = 0;
     private int coinY = 0;
+    private int currentCoins = 0;
     private int totalCoins = 0;
+    private Coin coinIcon;
+    private int powerUpCoinsNeeded = 10;
 
     private Player player;
     private int playerStartPosX = 180, playerStartPosY = 140;
@@ -45,7 +51,8 @@ public class GameView extends SurfaceView implements Runnable
     private int[] levelFileIds = new int[2];
 
     //max of 5 coins per level
-    private Coin[] levelCoins = new Coin[5];
+    private int maxLevelCoins = 6; //includes coin used as the coinCount Sprite
+    private Coin[] levelCoins = new Coin[maxLevelCoins];
 
     private int screenWidth = 720, screenHeight = 1612;
     private int gridX = 8;
@@ -53,9 +60,13 @@ public class GameView extends SurfaceView implements Runnable
     private int gridSize = 90;//pixels
     private GridNode[][] gameGrid = new GridNode[gridY][gridX];// nodes stored [y][x] in array
 
+    private long startTime = System.currentTimeMillis();
+    private int levelStartTime = 30;//seconds
+    private long elapsedLevelTime = 0;
+    private int coinTimeAddition = 10;//seconds
+
     public GameView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        //Log.d("GameView", "Constructor");
         surfaceHolder = getHolder();
 
         //save levelFileIds
@@ -75,13 +86,15 @@ public class GameView extends SurfaceView implements Runnable
         }
 
         player = new Player(playerSpriteRight, playerSpriteLeft);
+        coinIcon = new Coin(510, 25, coinSprite, false);//coin sprite for UI
+        coinIcon.SetVisible(true);
     }
 
     public void loadLevel() throws IOException
     {
-        for(int i = 0; i < 5; i++)
+        for(int i = 0; i < maxLevelCoins; i++)
         {
-            levelCoins[i] = new Coin(0, 0, coinSprite);
+            levelCoins[i] = new Coin(0, 0, coinSprite, true);
         }
 
         //read level from file
@@ -125,13 +138,10 @@ public class GameView extends SurfaceView implements Runnable
                 else if(levelString.charAt(levelStringIndex) == 'C')
                 {
                     nodeType = NodeType.coin;
-                    Log.v("Coins", "Checking though level coins");
-                    for(int i = 0; i < 5; i++)
+                    for(int i = 0; i < maxLevelCoins; i++)
                     {
-                        Log.v("Coins", "Checking available coins");
                         if(!levelCoins[i].GetVisible())
                         {
-                            Log.v("Coins", "Visible coin index = " + i);
                             levelCoins[i].SetNewPosition(x * gridSize, y * gridSize);
                             levelCoins[i].SetVisible(true);
                             break;
@@ -168,46 +178,28 @@ public class GameView extends SurfaceView implements Runnable
     {
         while(playing)
         {
-            if(playerCoinText != null)
+            if(elapsedLevelTime >= levelStartTime*1000)
             {
-                //game loop
-                long startFrameTime = System.currentTimeMillis();
-                update();
-                draw();
-                timeThisFrame = System.currentTimeMillis() - startFrameTime;
-                if (timeThisFrame >= 1) {
-                    fps = 1000 / timeThisFrame;
-                }
+                Log.v("Timer", "Level Time is up");
+            }
+            //game loop
+            long startFrameTime = System.currentTimeMillis();
+            update();
+            draw();
+            timeThisFrame = System.currentTimeMillis() - startFrameTime;
+            if (timeThisFrame >= 1) {
+                fps = 1000 / timeThisFrame;
             }
         }
     }
 
-    GameActivity gameActivity;
-    private boolean threadCheck = false;
-    public void setActivity(GameActivity gameActivity)
-    {
-        this.gameActivity = gameActivity;
-//        if(gameActivity.coinText != null)
-//        {
-//            threadCheck = true;
-//        }
-    }
-
-    TextView playerCoinText;//WHY DOES NONE OF THIS WORK
-    public void setCoinText(TextView coinText)
-    {
-        playerCoinText = coinText;
-    }
-
     private void update()
     {
+        //update Game Timer
+        elapsedLevelTime = (new Date()).getTime() - startTime;
+
         //update player
         player.update(fps, this);
-
-        if(playerCoinText != null)
-        {
-            playerCoinText.setText("Coins: " + String.valueOf(totalCoins));
-        }
 
         if(player.GetPositionY() > screenHeight)
         {
@@ -291,7 +283,7 @@ public class GameView extends SurfaceView implements Runnable
         }
 
         //check all coins against player
-        for(int i = 0; i < 5; i++)
+        for(int i = 0; i < maxLevelCoins; i++)
         {
             if(levelCoins[i].GetVisible())
             {
@@ -306,7 +298,9 @@ public class GameView extends SurfaceView implements Runnable
                         {
                             //player picks up coin
                             levelCoins[i].SetVisible(false);
+                            currentCoins++;
                             totalCoins++;
+                            addCoinTime();
                             break;
                         }
                         break;
@@ -319,7 +313,9 @@ public class GameView extends SurfaceView implements Runnable
                         {
                             //player picks up coin
                             levelCoins[i].SetVisible(false);
+                            currentCoins++;
                             totalCoins++;
+                            addCoinTime();
                             break;
                         }
                         break;
@@ -332,7 +328,9 @@ public class GameView extends SurfaceView implements Runnable
                         {
                             //player picks up coin
                             levelCoins[i].SetVisible(false);
+                            currentCoins++;
                             totalCoins++;
+                            addCoinTime();
                             break;
                         }
                         break;
@@ -345,7 +343,9 @@ public class GameView extends SurfaceView implements Runnable
                         {
                             //player picks up coin
                             levelCoins[i].SetVisible(false);
+                            currentCoins++;
                             totalCoins++;
+                            addCoinTime();
                             break;
                         }
                         break;
@@ -391,7 +391,14 @@ public class GameView extends SurfaceView implements Runnable
         }
     }
 
-    public int getPlayerCoins(){return totalCoins;}
+    public void addCoinTime()
+    {
+        //check if I need to add coin time
+        if(totalCoins % 5 == 0)
+        {
+            startTime = startTime + (coinTimeAddition * 1000);
+        }
+    }
 
     public void draw()
     {
@@ -400,11 +407,11 @@ public class GameView extends SurfaceView implements Runnable
             canvas = surfaceHolder.lockCanvas();
 
             //(Clear bg)
-            //draw testbg
+            //draw level bg
             canvas.drawBitmap(levelBackgrounds[currentLevelIndex], 0, 0, null);
 
             //draw coins
-            for(int i = 0; i < 5; i++)
+            for(int i = 0; i < maxLevelCoins; i++)
             {
                 levelCoins[i].draw(canvas);
             }
@@ -412,10 +419,63 @@ public class GameView extends SurfaceView implements Runnable
             //draw player
             player.draw(canvas);
 
+            //draw coin UI
+            drawCoinUI(canvas);
+            //draw timer ui
+            drawTimerUI(canvas);
+
+            //draw shake ui
+            if(currentCoins >= powerUpCoinsNeeded)
+                drawShakeUI(canvas);
+
             surfaceHolder.unlockCanvasAndPost(canvas);
 
         }
     }
+
+    public void drawTimerUI(Canvas canvas)
+    {
+        //draw UI
+        Paint uiTRectPaint = new Paint();
+        uiTRectPaint.setColor(Color.WHITE);
+        canvas.drawRect(0, 0, 225, 155, uiTRectPaint);
+
+        uiTRectPaint.setColor(Color.BLACK);
+        canvas.drawRect(0, 0, 220, 150, uiTRectPaint);
+
+        Paint uiTextPaint = new Paint();
+        uiTextPaint.setColor(Color.WHITE);
+        uiTextPaint.setTextSize(60);
+        canvas.drawText(String.valueOf(levelStartTime - (elapsedLevelTime / 1000)), 60, 90, uiTextPaint);
+    }
+
+    public void drawCoinUI(Canvas canvas)
+    {
+        //draw UI
+        Paint uiTRectPaint = new Paint();
+        uiTRectPaint.setColor(Color.WHITE);
+        canvas.drawRect(495, 0, 720, 155, uiTRectPaint);
+
+        uiTRectPaint.setColor(Color.BLACK);
+        canvas.drawRect(500, 0, 720, 150, uiTRectPaint);
+
+        coinIcon.draw(canvas);
+
+        Paint uiTextPaint = new Paint();
+        uiTextPaint.setColor(Color.WHITE);
+        uiTextPaint.setTextSize(60);
+        canvas.drawText(String.valueOf(currentCoins), 610, 90, uiTextPaint);
+    }
+
+    public void drawShakeUI(Canvas canvas)
+    {
+        Paint uiTextPaint = new Paint();
+        uiTextPaint.setColor(Color.WHITE);
+        uiTextPaint.setTextSize(60);
+        canvas.drawText("-SHAKE-", 500, 220, uiTextPaint);
+    }
+
+
 
     public void pause()
     {

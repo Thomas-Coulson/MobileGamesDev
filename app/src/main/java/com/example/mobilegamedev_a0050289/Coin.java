@@ -11,6 +11,7 @@ public class Coin {
 
     //private boolean pickedUp = false;
     private boolean visible = false;
+    private boolean animated = false;
     private int xPos = 0, yPos = 0;
 
     private Bitmap sprite;
@@ -24,12 +25,14 @@ public class Coin {
 
     private RectF Hitbox = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
 
-    public Coin(int xpos, int ypos, Bitmap coinSprite)
+    public Coin(int xpos, int ypos, Bitmap coinSprite, boolean isAnimated)
     {
         sprite = Bitmap.createScaledBitmap(coinSprite, frameW * frameCount, frameH, false);
         xPos = xpos;
         yPos = ypos;
+        animated = isAnimated;
         Hitbox = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
+        whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
     }
 
     protected void manageCurrentFrame()
@@ -58,7 +61,8 @@ public class Coin {
         if(visible)
         {
             whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
-            manageCurrentFrame();
+            if(animated)
+                manageCurrentFrame();
             canvas.drawBitmap(sprite, frameToDraw, whereToDraw, null);
         }
 
