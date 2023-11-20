@@ -435,6 +435,8 @@ public class GameView extends SurfaceView implements Runnable
 
     public void drawTimerUI(Canvas canvas)
     {
+        long timerValue = levelStartTime - (elapsedLevelTime / 1000);
+
         //draw UI
         Paint uiTRectPaint = new Paint();
         uiTRectPaint.setColor(Color.WHITE);
@@ -444,7 +446,10 @@ public class GameView extends SurfaceView implements Runnable
         canvas.drawRect(0, 0, 220, 150, uiTRectPaint);
 
         Paint uiTextPaint = new Paint();
-        uiTextPaint.setColor(Color.WHITE);
+        if(timerValue <= 10)//make timer red when low
+            uiTextPaint.setColor(Color.RED);
+        else
+            uiTextPaint.setColor(Color.WHITE);
         uiTextPaint.setTextSize(60);
         canvas.drawText(String.valueOf(levelStartTime - (elapsedLevelTime / 1000)), 60, 90, uiTextPaint);
     }
