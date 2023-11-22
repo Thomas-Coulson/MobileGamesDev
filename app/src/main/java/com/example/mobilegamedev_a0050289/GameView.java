@@ -23,7 +23,6 @@ import java.util.Timer;
 
 public class GameView extends SurfaceView implements Runnable
 {
-
     private Thread gameThread;
     private SurfaceHolder surfaceHolder;
     private volatile boolean playing;
@@ -46,6 +45,8 @@ public class GameView extends SurfaceView implements Runnable
     private Player player;
     private int playerStartPosX = 180, playerStartPosY = 140;
     private int currentLevelIndex = 0;
+    private int playerBaseSpeed = 700;
+    private int playerBoostedSpeed = 1200;
 
     private Bitmap[] levelBackgrounds = new Bitmap[2];//stores all level images
     private int[] levelFileIds = new int[2];
@@ -64,6 +65,11 @@ public class GameView extends SurfaceView implements Runnable
     private int levelStartTime = 30;//seconds
     private long elapsedLevelTime = 0;
     private int coinTimeAddition = 10;//seconds
+
+    private long startPowerupTime;
+    private long elapsedPowerupTime = 0;
+    private int powerupDuration = 5;//seconds
+    private boolean poweredUp = false;
 
     public GameView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -182,6 +188,14 @@ public class GameView extends SurfaceView implements Runnable
             {
                 Log.v("Timer", "Level Time is up");
             }
+            if(poweredUp)
+            {
+                if(elapsedPowerupTime >= powerupDuration*1000)
+                {
+                    stopSpeedBoost();
+                }
+            }
+
             //game loop
             long startFrameTime = System.currentTimeMillis();
             update();
@@ -197,6 +211,12 @@ public class GameView extends SurfaceView implements Runnable
     {
         //update Game Timer
         elapsedLevelTime = (new Date()).getTime() - startTime;
+
+        //update powerup timer
+        if(poweredUp)
+        {
+            elapsedPowerupTime = (new Date()).getTime() - startPowerupTime;
+        }
 
         //update player
         player.update(fps, this);
@@ -391,6 +411,32 @@ public class GameView extends SurfaceView implements Runnable
         }
     }
 
+    public void onShakeDetected()
+    {
+        Log.v("Shake", "Acceleration changed");
+        startSpeedBoost();
+    }
+
+    public void startSpeedBoost()
+    {
+        if(currentCoins >= 10 && !poweredUp)
+        {
+            Log.v("PowerUp", "Player has speed boost");
+            currentCoins -= 10;
+            startPowerupTime = System.currentTimeMillis();
+            player.setPlayerSpeed(playerBoostedSpeed);
+            poweredUp = true;
+        }
+    }
+
+    public void stopSpeedBoost()
+    {
+        Log.v("PowerUp", "Player lost speed boost");
+        poweredUp = false;
+        player.setPlayerSpeed(playerBaseSpeed);
+        elapsedPowerupTime = 0;
+    }
+
     public void addCoinTime()
     {
         //check if I need to add coin time
@@ -425,7 +471,9 @@ public class GameView extends SurfaceView implements Runnable
             drawTimerUI(canvas);
 
             //draw shake ui
-            if(currentCoins >= powerUpCoinsNeeded)
+//            if(currentCoins >= powerUpCoinsNeeded)
+//                drawShakeUI(canvas);
+            if(poweredUp)
                 drawShakeUI(canvas);
 
             surfaceHolder.unlockCanvasAndPost(canvas);
@@ -474,13 +522,16 @@ public class GameView extends SurfaceView implements Runnable
 
     public void drawShakeUI(Canvas canvas)
     {
+//        Paint uiTextPaint = new Paint();
+//        uiTextPaint.setColor(Color.WHITE);
+//        uiTextPaint.setTextSize(60);
+//        canvas.drawText("-SHAKE-", 500, 220, uiTextPaint);
+
         Paint uiTextPaint = new Paint();
         uiTextPaint.setColor(Color.WHITE);
         uiTextPaint.setTextSize(60);
-        canvas.drawText("-SHAKE-", 500, 220, uiTextPaint);
+        canvas.drawText("-SPEED-", 500, 220, uiTextPaint);
     }
-
-
 
     public void pause()
     {

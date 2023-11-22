@@ -131,14 +131,14 @@ public class Player
         yPos = y;
     }
 
+    public void setPlayerSpeed(int newSpeed){speed = newSpeed;}
+
     public float GetPositionX() { return xPos; }
     public float GetPositionY() { return yPos; }
-
     public MoveDirection getMoveDirection()
     {
         return moveDirection;
     }
-
     public RectF getHitBox()
     {
         return hitBox;
