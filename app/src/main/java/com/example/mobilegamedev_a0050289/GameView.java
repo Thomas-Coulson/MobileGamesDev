@@ -33,6 +33,10 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap playerSpriteLeft;
     private Bitmap bgSprite1;
     private Bitmap bgSprite2;
+    private Bitmap bgSprite3;
+    private Bitmap bgSprite4;
+    private Bitmap bgSprite5;
+    private Bitmap bgSprite6;
 
     private Bitmap coinSprite;
     private int coinX = 0;
@@ -43,13 +47,13 @@ public class GameView extends SurfaceView implements Runnable
     private int powerUpCoinsNeeded = 10;
 
     private Player player;
-    private int playerStartPosX = 180, playerStartPosY = 140;
+    private int playerStartPosX = 0, playerStartPosY = 0;
     private int currentLevelIndex = 0;
     private int playerBaseSpeed = 700;
     private int playerBoostedSpeed = 1200;
 
-    private Bitmap[] levelBackgrounds = new Bitmap[2];//stores all level images
-    private int[] levelFileIds = new int[2];
+    private Bitmap[] levelBackgrounds = new Bitmap[6];//stores all level images
+    private int[] levelFileIds = new int[6];
 
     //max of 5 coins per level
     private int maxLevelCoins = 6; //includes coin used as the coinCount Sprite
@@ -78,6 +82,10 @@ public class GameView extends SurfaceView implements Runnable
         //save levelFileIds
         levelFileIds[0] = R.raw.level1;
         levelFileIds[1] = R.raw.level2;
+        levelFileIds[2] = R.raw.level3;
+        levelFileIds[3] = R.raw.level4;
+        levelFileIds[4] = R.raw.level5;
+        levelFileIds[5] = R.raw.level6;
 
         loadSprites();
 
@@ -92,6 +100,7 @@ public class GameView extends SurfaceView implements Runnable
         }
 
         player = new Player(playerSpriteRight, playerSpriteLeft);
+        player.setPosition(playerStartPosX, playerStartPosY);
         coinIcon = new Coin(510, 25, coinSprite, false);//coin sprite for UI
         coinIcon.SetVisible(true);
     }
@@ -155,6 +164,11 @@ public class GameView extends SurfaceView implements Runnable
 
                     }
                 }
+                else if(levelString.charAt(levelStringIndex) == 'P')
+                {
+                    playerStartPosX = x * 90;
+                    playerStartPosY = (y * 90) - 40;
+                }
 
                 gameGrid[y][x] = new GridNode(nodeType, gridSize, x * gridSize, y * gridSize);
                 levelStringIndex++;
@@ -174,6 +188,22 @@ public class GameView extends SurfaceView implements Runnable
         bgSprite2 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg2);
         bgSprite2 = Bitmap.createScaledBitmap(bgSprite2, screenWidth, screenHeight, false);
         levelBackgrounds[1] = bgSprite2;
+
+        bgSprite3 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg3);
+        bgSprite3 = Bitmap.createScaledBitmap(bgSprite3, screenWidth, screenHeight, false);
+        levelBackgrounds[2] = bgSprite3;
+
+        bgSprite4 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg4);
+        bgSprite4 = Bitmap.createScaledBitmap(bgSprite4, screenWidth, screenHeight, false);
+        levelBackgrounds[3] = bgSprite4;
+
+        bgSprite5 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg5);
+        bgSprite5 = Bitmap.createScaledBitmap(bgSprite5, screenWidth, screenHeight, false);
+        levelBackgrounds[4] = bgSprite5;
+
+        bgSprite6 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg6);
+        bgSprite6 = Bitmap.createScaledBitmap(bgSprite6, screenWidth, screenHeight, false);
+        levelBackgrounds[5] = bgSprite6;
 
         coinSprite = BitmapFactory.decodeResource(getResources(), R.drawable.coin);
 
@@ -374,9 +404,6 @@ public class GameView extends SurfaceView implements Runnable
                 }
             }
         }
-
-
-
     }
 
     public void movePlayerRight()
@@ -413,7 +440,6 @@ public class GameView extends SurfaceView implements Runnable
 
     public void onShakeDetected()
     {
-        Log.v("Shake", "Acceleration changed");
         startSpeedBoost();
     }
 
@@ -421,7 +447,6 @@ public class GameView extends SurfaceView implements Runnable
     {
         if(currentCoins >= 10 && !poweredUp)
         {
-            Log.v("PowerUp", "Player has speed boost");
             currentCoins -= 10;
             startPowerupTime = System.currentTimeMillis();
             player.setPlayerSpeed(playerBoostedSpeed);
@@ -431,7 +456,6 @@ public class GameView extends SurfaceView implements Runnable
 
     public void stopSpeedBoost()
     {
-        Log.v("PowerUp", "Player lost speed boost");
         poweredUp = false;
         player.setPlayerSpeed(playerBaseSpeed);
         elapsedPowerupTime = 0;
@@ -471,9 +495,7 @@ public class GameView extends SurfaceView implements Runnable
             drawTimerUI(canvas);
 
             //draw shake ui
-//            if(currentCoins >= powerUpCoinsNeeded)
-//                drawShakeUI(canvas);
-            if(poweredUp)
+            if(currentCoins >= powerUpCoinsNeeded)
                 drawShakeUI(canvas);
 
             surfaceHolder.unlockCanvasAndPost(canvas);
@@ -522,15 +544,10 @@ public class GameView extends SurfaceView implements Runnable
 
     public void drawShakeUI(Canvas canvas)
     {
-//        Paint uiTextPaint = new Paint();
-//        uiTextPaint.setColor(Color.WHITE);
-//        uiTextPaint.setTextSize(60);
-//        canvas.drawText("-SHAKE-", 500, 220, uiTextPaint);
-
         Paint uiTextPaint = new Paint();
         uiTextPaint.setColor(Color.WHITE);
         uiTextPaint.setTextSize(60);
-        canvas.drawText("-SPEED-", 500, 220, uiTextPaint);
+        canvas.drawText("-SHAKE-", 500, 220, uiTextPaint);
     }
 
     public void pause()

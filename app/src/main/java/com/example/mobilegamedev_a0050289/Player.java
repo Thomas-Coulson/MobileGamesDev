@@ -27,7 +27,7 @@ public class Player
     private long lastFrameChangeTime = 0;
     private int frameLengthInMS = 100;
 
-    private float xPos = 180, yPos = 140;//(should use grid pos') (-40 above current node)
+    private float xPos = 180, yPos = 140;//(-40 above current node)
     private float speed = 700; //px/s
     private Rect frameToDraw = new Rect(0,0,frameW,frameH);
     private RectF whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
