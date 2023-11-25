@@ -75,6 +75,8 @@ public class GameView extends SurfaceView implements Runnable
     private int powerupDuration = 5;//seconds
     private boolean poweredUp = false;
 
+    private boolean gameOver = false;
+
     public GameView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         surfaceHolder = getHolder();
@@ -214,9 +216,12 @@ public class GameView extends SurfaceView implements Runnable
     {
         while(playing)
         {
+            long startFrameTime = System.currentTimeMillis();
+
             if(elapsedLevelTime >= levelStartTime*1000)
             {
                 Log.v("Timer", "Level Time is up");
+                gameOver = true;
             }
             if(poweredUp)
             {
@@ -227,9 +232,18 @@ public class GameView extends SurfaceView implements Runnable
             }
 
             //game loop
-            long startFrameTime = System.currentTimeMillis();
-            update();
+            if(!gameOver)
+            {
+                update();
+            }
+            else
+            {
+                //essentially pause game herre
+                player.setMoveDirection(MoveDirection.Stopped);
+            }
+
             draw();
+
             timeThisFrame = System.currentTimeMillis() - startFrameTime;
             if (timeThisFrame >= 1) {
                 fps = 1000 / timeThisFrame;
@@ -477,29 +491,39 @@ public class GameView extends SurfaceView implements Runnable
             canvas = surfaceHolder.lockCanvas();
 
             //(Clear bg)
-            //draw level bg
-            canvas.drawBitmap(levelBackgrounds[currentLevelIndex], 0, 0, null);
 
-            //draw coins
-            for(int i = 0; i < maxLevelCoins; i++)
+            canvas.drawColor(Color.BLACK);
+
+            if(!gameOver)
             {
-                levelCoins[i].draw(canvas);
+                //draw level bg
+                canvas.drawBitmap(levelBackgrounds[currentLevelIndex], 0, 0, null);
+
+                //draw coins
+                for(int i = 0; i < maxLevelCoins; i++)
+                {
+                    levelCoins[i].draw(canvas);
+                }
+
+                //draw player
+                player.draw(canvas);
+
+                //draw coin UI
+                drawCoinUI(canvas);
+                //draw timer ui
+                drawTimerUI(canvas);
+
+                //draw shake ui
+                if(currentCoins >= powerUpCoinsNeeded)
+                    drawShakeUI(canvas);
+            }
+            else
+            {
+                //game over screen
+                drawGameOverrUI(canvas);
             }
 
-            //draw player
-            player.draw(canvas);
-
-            //draw coin UI
-            drawCoinUI(canvas);
-            //draw timer ui
-            drawTimerUI(canvas);
-
-            //draw shake ui
-            if(currentCoins >= powerUpCoinsNeeded)
-                drawShakeUI(canvas);
-
             surfaceHolder.unlockCanvasAndPost(canvas);
-
         }
     }
 
@@ -549,6 +573,15 @@ public class GameView extends SurfaceView implements Runnable
         uiTextPaint.setTextSize(60);
         canvas.drawText("-SHAKE-", 500, 220, uiTextPaint);
     }
+
+    public void drawGameOverrUI(Canvas canvas)
+    {
+        Paint uiTextPaint = new Paint();
+        uiTextPaint.setColor(Color.WHITE);
+        uiTextPaint.setTextSize(60);
+        canvas.drawText("GAME OVER", 50, 400, uiTextPaint);
+    }
+
 
     public void pause()
     {
