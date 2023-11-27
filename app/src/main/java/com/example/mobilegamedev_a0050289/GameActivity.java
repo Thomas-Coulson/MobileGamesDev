@@ -32,6 +32,9 @@ public class GameActivity extends AppCompatActivity {
 
         //set gameview, and the swipe listner
         gameView = findViewById(R.id.gameView);
+
+        gameView.setGameActivity(this);
+
         gameView.setOnTouchListener(new OnSwipeTouchListener(GameActivity.this)
         {
             public void onSwipeTop() {
