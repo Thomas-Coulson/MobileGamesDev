@@ -68,7 +68,7 @@ public class GameView extends SurfaceView implements Runnable
     private GridNode[][] gameGrid = new GridNode[gridY][gridX];// nodes stored [y][x] in array
 
     private long startTime = System.currentTimeMillis();
-    private int levelStartTime = 10;//seconds
+    private int levelStartTime = 30;//seconds
     private long elapsedLevelTime = 0;
     private int coinTimeAddition = 10;//seconds
 
