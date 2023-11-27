@@ -59,6 +59,7 @@ public class GameView extends SurfaceView implements Runnable
     //max of 5 coins per level
     private int maxLevelCoins = 6; //includes coin used as the coinCount Sprite
     private Coin[] levelCoins = new Coin[maxLevelCoins];
+    private int completedLevels = 0;
 
     private int screenWidth = 720, screenHeight = 1612;
     private int gridX = 8;
@@ -67,7 +68,7 @@ public class GameView extends SurfaceView implements Runnable
     private GridNode[][] gameGrid = new GridNode[gridY][gridX];// nodes stored [y][x] in array
 
     private long startTime = System.currentTimeMillis();
-    private int levelStartTime = 30;//seconds
+    private int levelStartTime = 10;//seconds
     private long elapsedLevelTime = 0;
     private int coinTimeAddition = 10;//seconds
 
@@ -78,7 +79,18 @@ public class GameView extends SurfaceView implements Runnable
 
     private long startGameOverTime;
     private long elapsedGameOverTime = 0;
-    private int gameOverTimeDuration = 2;//seconds
+    private int gameOverTimeDuration = 5;//seconds
+    private int scoreLine1Delay = 1;//seconds
+    private int scoreLine2Delay = 2;//seconds
+    private int scoreLine3Delay = 3;//seconds
+    private int scoreLine4Delay = 4;//seconds
+
+    private boolean showScoreLine1 = false;//rooms cleared
+    private boolean showScoreLine2 = false;//total coins
+    private boolean showScoreLine3 = false;//current coins
+    private boolean showScoreLine4 = false;//Total Score
+
+    private long finalScore = 0;
 
     private boolean gameOver = false;
     private boolean canRestart = false;
@@ -231,7 +243,7 @@ public class GameView extends SurfaceView implements Runnable
                 //Log.v("Timer", "gameOver = " + gameOver);
                 if(gameOver == false)
                 {
-                    //Log.v("GOTimer", "game over timer started");
+                    Log.v("GOTimer", "game over timer started");
                     startGameOverTimer();
                 }
                 gameOver = true;
@@ -240,10 +252,26 @@ public class GameView extends SurfaceView implements Runnable
             //Log.v("Timer", "CanRestart = " + canRestart);
             if(gameOver && !canRestart)
             {
-                Log.v("Timer", "restart timer finished");
+                //incrementally show score multipliers
+                if(elapsedGameOverTime >= scoreLine1Delay*1000)
+                {
+                    showScoreLine1 = true;
+                }
+                if(elapsedGameOverTime >= scoreLine2Delay*1000)
+                {
+                    showScoreLine2 = true;
+                }
+                if(elapsedGameOverTime >= scoreLine3Delay*1000)
+                {
+                    showScoreLine3 = true;
+                }
+                if(elapsedGameOverTime >= scoreLine4Delay*1000)
+                {
+                    showScoreLine4 = true;
+                }
                 if(elapsedGameOverTime >= gameOverTimeDuration*1000)
                 {
-                    Log.v("Timer", "restart timer finished");
+                    Log.v("GOTimer", "game over timer Finished");
                     canRestart = true;
                 }
             }
@@ -256,18 +284,12 @@ public class GameView extends SurfaceView implements Runnable
             }
 
             //game loop
-            if(!gameOver)
-            {
-                update();
-            }
-            else
-            {
-                //essentially pause game herre
-                player.setMoveDirection(MoveDirection.Stopped);
-            }
+            update();
 
+            //draw game
             draw();
 
+            //update frames
             timeThisFrame = System.currentTimeMillis() - startFrameTime;
             if (timeThisFrame >= 1) {
                 fps = 1000 / timeThisFrame;
@@ -277,32 +299,35 @@ public class GameView extends SurfaceView implements Runnable
 
     private void update()
     {
-        //update Game Timer
-        elapsedLevelTime = (new Date()).getTime() - startTime;
-
-        //update powerup timer
-        if(poweredUp)
-        {
-            elapsedPowerupTime = (new Date()).getTime() - startPowerupTime;
-        }
-
         if(gameOver && !canRestart)
         {
-            Log.v("Timer", "Updating elsapsed time");
+            //essentially pause game here
+            player.setMoveDirection(MoveDirection.Stopped);
+            //Log.v("Timer", "Updating elsapsed gameover time");
             elapsedGameOverTime = (new Date()).getTime() - startGameOverTime;
         }
-
-        //update player
-        player.update(fps, this);
-
-        if(player.GetPositionY() > screenHeight)
+        else if(!gameOver)
         {
-            loadNextLevel();
+            //update Game Timer
+            elapsedLevelTime = (new Date()).getTime() - startTime;
+
+            //update powerup timer
+            if(poweredUp)
+            {
+                elapsedPowerupTime = (new Date()).getTime() - startPowerupTime;
+            }
+
+            //update player
+            player.update(fps, this);
+
+            if(player.GetPositionY() > screenHeight)
+            {
+                loadNextLevel();
+            }
+
+            //update Collisions
+            checkCollisions();
         }
-
-        //update Collisions
-        checkCollisions();
-
     }
 
     public void checkCollisions()
@@ -492,6 +517,29 @@ public class GameView extends SurfaceView implements Runnable
         }
     }
 
+    public void loadNextLevel()
+    {
+        //Increase level index (cycle round when at end of list)
+        if(currentLevelIndex >= levelFileIds.length - 1)
+            currentLevelIndex = 0;
+        else
+            currentLevelIndex++;
+
+        completedLevels++;
+
+        //load next level
+        try
+        {
+            loadLevel();
+        }
+        catch(Exception exception)
+        {
+            exception.printStackTrace();;
+        }
+
+        player.setPosition(playerStartPosX, playerStartPosY);
+    }
+
     public void setGameActivity(GameActivity currentGameActivity){gameActivity = currentGameActivity;}
 
     public void onShakeDetected()
@@ -555,6 +603,13 @@ public class GameView extends SurfaceView implements Runnable
 
         startTime = System.currentTimeMillis();
         elapsedLevelTime = 0;
+
+        showScoreLine1 = false;
+        showScoreLine2 = false;
+        showScoreLine3 = false;
+        showScoreLine4 = false;
+
+        finalScore = 0;
 
         gameOver = false;
         canRestart = false;
@@ -655,21 +710,63 @@ public class GameView extends SurfaceView implements Runnable
         Paint uiTextPaint = new Paint();
         uiTextPaint.setColor(Color.WHITE);
         uiTextPaint.setTextSize(60);
-        canvas.drawText("GAME OVER", 50, 400, uiTextPaint);
+        canvas.drawText("GAME OVER", 50, 100, uiTextPaint);
 
+        drawScoreMultiplierUI(canvas);
+
+        //Log.v("Paint", "Can restart = " + canRestart);
         if(canRestart)
         {
+            //Log.v("Paint", "Painting reset go messages");
+
             Paint uiSwipeUpTextPaint = new Paint();
-            uiTextPaint.setColor(Color.WHITE);
-            uiTextPaint.setTextSize(50);
-            canvas.drawText("Swipe up to restart", 50, 700, uiTextPaint);
+            uiSwipeUpTextPaint.setColor(Color.WHITE);
+            uiSwipeUpTextPaint.setTextSize(50);
+            canvas.drawText("Swipe up to restart", 50, 1300, uiSwipeUpTextPaint);
 
             Paint uiTextSwipeDownPaint = new Paint();
-            uiTextPaint.setColor(Color.WHITE);
-            uiTextPaint.setTextSize(50);
-            canvas.drawText("Swipe down for Title Screen", 50, 1000, uiTextPaint);
+            uiTextSwipeDownPaint.setColor(Color.WHITE);
+            uiTextSwipeDownPaint.setTextSize(50);
+            canvas.drawText("Swipe down for Title Screen", 50, 1400, uiTextSwipeDownPaint);
         }
 
+    }
+
+    public void drawScoreMultiplierUI(Canvas canvas)
+    {
+        Paint uiScoreTotalPaint = new Paint();
+        uiScoreTotalPaint.setColor(Color.WHITE);
+        uiScoreTotalPaint.setTextSize(75);
+        canvas.drawText("Total:", 250, 750, uiScoreTotalPaint);
+
+        if(showScoreLine1)
+        {
+            Paint uiScoreRoomsPaint = new Paint();
+            uiScoreRoomsPaint.setColor(Color.WHITE);
+            uiScoreRoomsPaint.setTextSize(50);
+            canvas.drawText("Rooms Completed = " + completedLevels, 50, 300, uiScoreRoomsPaint);
+        }
+        if(showScoreLine2)
+        {
+            Paint uiScoreTotalCoinsPaint = new Paint();
+            uiScoreTotalCoinsPaint.setColor(Color.WHITE);
+            uiScoreTotalCoinsPaint.setTextSize(50);
+            canvas.drawText("Total Coins Collected = " + totalCoins, 50, 400, uiScoreTotalCoinsPaint);
+        }
+        if(showScoreLine3)
+        {
+            Paint uiScoreCurrentCoinsPaint = new Paint();
+            uiScoreCurrentCoinsPaint.setColor(Color.WHITE);
+            uiScoreCurrentCoinsPaint.setTextSize(50);
+            canvas.drawText("Current Coins = " + currentCoins, 50, 500, uiScoreCurrentCoinsPaint);
+        }
+        if(showScoreLine4)
+        {
+            finalScore = (completedLevels + totalCoins) * currentCoins;
+            canvas.drawText("(" + completedLevels + " + " + totalCoins + ") x " + currentCoins, 160, 880, uiScoreTotalPaint);
+            canvas.drawText("-" + finalScore + "-", 275, 1010, uiScoreTotalPaint);
+
+        }
     }
 
     public void pause()
@@ -687,27 +784,6 @@ public class GameView extends SurfaceView implements Runnable
         playing = true;
         gameThread = new Thread(this);
         gameThread.start();
-    }
-
-    public void loadNextLevel()
-    {
-        //Increase level index (cycle round when at end of list)
-        if(currentLevelIndex >= levelFileIds.length - 1)
-            currentLevelIndex = 0;
-        else
-            currentLevelIndex++;
-
-        //load next level
-        try
-        {
-            loadLevel();
-        }
-        catch(Exception exception)
-        {
-            exception.printStackTrace();;
-        }
-
-        player.setPosition(playerStartPosX, playerStartPosY);
     }
 
     @Override

@@ -3,39 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"><![CDATA[
+    android:layout_height="wrap_content"
+    android:background="#1C1117"
     tools:context=".MainActivity">
 
-
-
-
-
-
-
-
-
-    ]]>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="228dp"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="104dp"
-        android:layout_marginTop="232dp"
-        android:text="Title Menu"
-        android:textAlignment="center"
-        android:textSize="48sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:srcCompat="@drawable/menubg" />
 
     <Button
         android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
+        android:layout_width="259dp"
+        android:layout_height="86dp"
+        android:layout_marginTop="332dp"
         android:alpha="255"
         android:backgroundTint="#4CAF50"
+        android:foreground="@drawable/startbutton"
         android:onClick="onTouchStartGame"
         android:text="Start Game"
         android:textAlignment="center"
@@ -43,5 +33,5 @@
         android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
