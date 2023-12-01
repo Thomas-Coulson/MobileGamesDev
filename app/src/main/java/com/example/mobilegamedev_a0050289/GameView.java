@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.Random;
 import java.util.Timer;
 
 public class GameView extends SurfaceView implements Runnable
@@ -53,8 +54,10 @@ public class GameView extends SurfaceView implements Runnable
     private int playerBaseSpeed = 700;
     private int playerBoostedSpeed = 1200;
 
-    private Bitmap[] levelBackgrounds = new Bitmap[6];//stores all level images
-    private int[] levelFileIds = new int[6];
+    private int numberOfLevels = 6;
+    private Bitmap[] levelBackgrounds = new Bitmap[numberOfLevels];//stores all level images
+    private int[] levelFileIds = new int[numberOfLevels];
+    private int[] visitedLevels = new int[numberOfLevels];//filled with 0s by default, so will always start with level0;
 
     //max of 5 coins per level
     private int maxLevelCoins = 6; //includes coin used as the coinCount Sprite
@@ -109,6 +112,15 @@ public class GameView extends SurfaceView implements Runnable
         levelFileIds[5] = R.raw.level6;
 
         loadSprites();
+
+        //set all values of visited levels to 999 (because 0 counts a s a level id to check and 999 doesnt)
+        for(int i = 0; i < visitedLevels.length; i++)
+        {
+            visitedLevels[i] = 999;
+        }
+
+        //Randomise level
+        currentLevelIndex = new Random().nextInt(numberOfLevels);
 
         //loadLevel will throw an exception if file cannot be read
         try
@@ -195,6 +207,8 @@ public class GameView extends SurfaceView implements Runnable
                 levelStringIndex++;
             }
         }
+
+        visitedLevels[completedLevels] = currentLevelIndex;
     }
 
     public void loadSprites()
@@ -519,11 +533,44 @@ public class GameView extends SurfaceView implements Runnable
 
     public void loadNextLevel()
     {
-        //Increase level index (cycle round when at end of list)
-        if(currentLevelIndex >= levelFileIds.length - 1)
-            currentLevelIndex = 0;
-        else
-            currentLevelIndex++;
+        //Increase level index (cycle round when at end of list) (Not Applicable when randomising levels)
+//        if(currentLevelIndex >= levelFileIds.length - 1)
+//            currentLevelIndex = 0;
+//        else
+//            currentLevelIndex++;
+
+        if(completedLevels % (numberOfLevels - 1) == 0 && completedLevels != 0)
+        {
+            //reset visited levels - means we can load all levels again as we have visited all of them
+            //set all values of visited levels to 999 (because 0 counts a s a level id to check and 999 doesnt)
+            for(int i = 0; i < visitedLevels.length; i++)
+            {
+                visitedLevels[i] = 999;
+            }
+        }
+
+        //randomise current/next level
+        boolean looping = true;
+        boolean dupeFound = false;
+
+        while(looping)
+        {
+            currentLevelIndex = new Random().nextInt(numberOfLevels);
+            dupeFound = false;
+
+            for(int level = 0; level < visitedLevels.length; level++)
+            {
+                if(visitedLevels[level] == currentLevelIndex)
+                {
+                    dupeFound = true;
+                }
+            }
+
+            if(!dupeFound)
+            {
+                looping = false;
+            }
+        }
 
         completedLevels++;
 
