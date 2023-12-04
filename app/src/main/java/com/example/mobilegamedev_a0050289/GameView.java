@@ -96,6 +96,8 @@ public class GameView extends SurfaceView implements Runnable
     private boolean showScoreLine4 = false;//Total Score
 
     private int finalScore = 0;
+    private boolean writtenScore = false;
+    private int[] highscores = new int[5];
 
     private SharedPreferences sharedPref;
 
@@ -262,6 +264,7 @@ public class GameView extends SurfaceView implements Runnable
                 if(gameOver == false)
                 {
                     Log.v("GOTimer", "game over timer started");
+                    finalScore = completedLevels + totalCoins + currentCoins;
                     startGameOverTimer();
                 }
                 gameOver = true;
@@ -291,7 +294,32 @@ public class GameView extends SurfaceView implements Runnable
                 {
                     //set final score, and save to shared preferences
                     //Do highscores in an array and text file---------
-                    finalScore = completedLevels + totalCoins + currentCoins;
+
+                    if(!writtenScore)
+                    {
+                        writtenScore = true;
+
+                        //read scores from file - into highscores array
+                        //loop through left to right, if current score > saved, add it and move others over to the right (lose the last one)
+                        //write new list scores file
+
+                        //Reading scores will throw an exception if file cannot be read
+                        try
+                        {
+                            readScores();
+                        }
+                        catch(Exception exception)
+                        {
+                            Log.v("Exception", "----- Throwing Exception -----");
+                            exception.printStackTrace();
+                        }
+
+                        for(int i = 0; i < highscores.length; i++)
+                        {
+                            Log.v("Scores", "HighScore " + i + " = " + highscores[i]);
+                        }
+                    }
+
                     canRestart = true;
                 }
             }
@@ -348,6 +376,62 @@ public class GameView extends SurfaceView implements Runnable
             //update Collisions
             checkCollisions();
         }
+    }
+
+    public void readScores() throws IOException
+    {
+        //read level from file
+        String string = "";
+        StringBuilder stringbuilder = new StringBuilder();
+        InputStream inputStream = this.getResources().openRawResource(R.raw.scores);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+        while(true)
+        {
+            Log.v("trying", "Running expection Reading Code");
+
+            try
+            {
+                if((string = reader.readLine()) == null)
+                {
+                    break;
+                }
+            }
+            catch(IOException exception)
+            {
+                exception.printStackTrace();
+            }
+            stringbuilder.append(string).append("");
+        }
+        reader.close();
+        inputStream.close();
+
+        Log.v("reading", "File has been read");
+
+        String scoreString = string.valueOf(stringbuilder);
+
+        Log.v("reading", "Actual string from file = " + scoreString);
+        Log.v("reading", "Length of this string is = " + scoreString.length());
+
+        String currentScore = "";
+        int scoreNumber = 0;
+
+        for(int i = 0; i < scoreString.length(); i++)
+        {
+            Log.v("reading", "Checking Char " + i + " which is " + scoreString.charAt(i));
+            if(scoreString.charAt(i) == ',')
+            {
+                highscores[scoreNumber] = Integer.getInteger(currentScore);
+                currentScore = "";
+                scoreNumber++;
+            }
+            else
+            {
+                currentScore = currentScore + scoreString.charAt(i);
+            }
+        }
+
+        Log.v("reading", "Number of scores found = " + scoreNumber);
     }
 
     public void checkCollisions()
