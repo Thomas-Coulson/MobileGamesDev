@@ -2,12 +2,14 @@ package com.example.mobilegamedev_a0050289;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -93,7 +95,9 @@ public class GameView extends SurfaceView implements Runnable
     private boolean showScoreLine3 = false;//current coins
     private boolean showScoreLine4 = false;//Total Score
 
-    private long finalScore = 0;
+    private int finalScore = 0;
+
+    private SharedPreferences sharedPref;
 
     private boolean gameOver = false;
     private boolean canRestart = false;
@@ -285,7 +289,9 @@ public class GameView extends SurfaceView implements Runnable
                 }
                 if(elapsedGameOverTime >= gameOverTimeDuration*1000)
                 {
-                    Log.v("GOTimer", "game over timer Finished");
+                    //set final score, and save to shared preferences
+                    //Do highscores in an array and text file---------
+                    finalScore = completedLevels + totalCoins + currentCoins;
                     canRestart = true;
                 }
             }
@@ -533,12 +539,6 @@ public class GameView extends SurfaceView implements Runnable
 
     public void loadNextLevel()
     {
-        //Increase level index (cycle round when at end of list) (Not Applicable when randomising levels)
-//        if(currentLevelIndex >= levelFileIds.length - 1)
-//            currentLevelIndex = 0;
-//        else
-//            currentLevelIndex++;
-
         if(completedLevels % (numberOfLevels - 1) == 0 && completedLevels != 0)
         {
             //reset visited levels - means we can load all levels again as we have visited all of them
@@ -809,8 +809,7 @@ public class GameView extends SurfaceView implements Runnable
         }
         if(showScoreLine4)
         {
-            finalScore = (completedLevels + totalCoins) * currentCoins;
-            canvas.drawText("(" + completedLevels + " + " + totalCoins + ") x " + currentCoins, 160, 880, uiScoreTotalPaint);
+            canvas.drawText(completedLevels + " + " + totalCoins + " + " + currentCoins, 175, 880, uiScoreTotalPaint);
             canvas.drawText("-" + finalScore + "-", 275, 1010, uiScoreTotalPaint);
 
         }

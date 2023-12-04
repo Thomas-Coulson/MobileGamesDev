@@ -11,6 +11,7 @@ public class MainActivity extends AppCompatActivity {
 //Main menu activity
 
     Button startButton;
+    Button scoresButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
 
         startButton = findViewById(R.id.startButton);
         startButton.setOnClickListener(this::onTouchStartGame);
+
+        scoresButton = findViewById(R.id.scoresButton);
+        scoresButton.setOnClickListener(this::onTouchScores);
     }
 
     public void onTouchStartGame(View view)
@@ -27,6 +31,13 @@ public class MainActivity extends AppCompatActivity {
         //Log.d("onTouchStartGame", "Button Pressed");
         Intent intent = new Intent(this, GameActivity.class);
         //Log.d("onTouchStartGame", "Intent made");
+        startActivity(intent);
+    }
+
+    public void onTouchScores(View view)
+    {
+        //move to Scores Activity when pressed
+        Intent intent = new Intent(this, ScoresActivity.class);
         startActivity(intent);
     }
 
