@@ -98,6 +98,7 @@ public class GameView extends SurfaceView implements Runnable
     private int finalScore = 0;
     private boolean writtenScore = false;
     private int[] highscores = new int[5];
+    private String[] highscoreKeys = {"highscore1_key", "highscore2_key", "highscore3_key", "highscore4_key", "highscore5_key"};
 
     private SharedPreferences sharedPref;
 
@@ -142,6 +143,8 @@ public class GameView extends SurfaceView implements Runnable
         player.setPosition(playerStartPosX, playerStartPosY);
         coinIcon = new Coin(510, 25, coinSprite, false);//coin sprite for UI
         coinIcon.SetVisible(true);
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void loadLevel() throws IOException
@@ -263,7 +266,6 @@ public class GameView extends SurfaceView implements Runnable
                 //Log.v("Timer", "gameOver = " + gameOver);
                 if(gameOver == false)
                 {
-                    Log.v("GOTimer", "game over timer started");
                     finalScore = completedLevels + totalCoins + currentCoins;
                     startGameOverTimer();
                 }
@@ -293,31 +295,49 @@ public class GameView extends SurfaceView implements Runnable
                 if(elapsedGameOverTime >= gameOverTimeDuration*1000)
                 {
                     //set final score, and save to shared preferences
-                    //Do highscores in an array and text file---------
-
                     if(!writtenScore)
                     {
                         writtenScore = true;
 
-                        //read scores from file - into highscores array
+                        //read scores from shard preferences - into highscores array
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        int defaultValue = 0;
+
+                        for(int i = 0; i < 5; i++)
+                        {
+                            highscores[i] = sharedPref.getInt(highscoreKeys[i], defaultValue);
+                        }
+
                         //loop through left to right, if current score > saved, add it and move others over to the right (lose the last one)
-                        //write new list scores file
+                        for(int scoreIdx = 0; scoreIdx < 5; scoreIdx++)
+                        {
+                            if(finalScore > highscores[scoreIdx])
+                            {
+                                //move all scores to the right
+                                for(int n = 4; n >= 0; n--)
+                                {
+                                    if(n > scoreIdx)
+                                    {
+                                        highscores[n] = highscores[n-1];
+                                    }
+                                    else
+                                    {
+                                        //add current high score
+                                        highscores[scoreIdx] = finalScore;
+                                        //break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
 
-                        //Reading scores will throw an exception if file cannot be read
-                        try
+                        //write highscores array to shared preferences
+                        for(int idx = 0; idx < highscores.length; idx++)
                         {
-                            readScores();
+                            editor.putInt(highscoreKeys[idx], highscores[idx]);
                         }
-                        catch(Exception exception)
-                        {
-                            Log.v("Exception", "----- Throwing Exception -----");
-                            exception.printStackTrace();
-                        }
+                        editor.apply();
 
-                        for(int i = 0; i < highscores.length; i++)
-                        {
-                            Log.v("Scores", "HighScore " + i + " = " + highscores[i]);
-                        }
                     }
 
                     canRestart = true;
@@ -376,62 +396,6 @@ public class GameView extends SurfaceView implements Runnable
             //update Collisions
             checkCollisions();
         }
-    }
-
-    public void readScores() throws IOException
-    {
-        //read level from file
-        String string = "";
-        StringBuilder stringbuilder = new StringBuilder();
-        InputStream inputStream = this.getResources().openRawResource(R.raw.scores);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-        while(true)
-        {
-            Log.v("trying", "Running expection Reading Code");
-
-            try
-            {
-                if((string = reader.readLine()) == null)
-                {
-                    break;
-                }
-            }
-            catch(IOException exception)
-            {
-                exception.printStackTrace();
-            }
-            stringbuilder.append(string).append("");
-        }
-        reader.close();
-        inputStream.close();
-
-        Log.v("reading", "File has been read");
-
-        String scoreString = string.valueOf(stringbuilder);
-
-        Log.v("reading", "Actual string from file = " + scoreString);
-        Log.v("reading", "Length of this string is = " + scoreString.length());
-
-        String currentScore = "";
-        int scoreNumber = 0;
-
-        for(int i = 0; i < scoreString.length(); i++)
-        {
-            Log.v("reading", "Checking Char " + i + " which is " + scoreString.charAt(i));
-            if(scoreString.charAt(i) == ',')
-            {
-                highscores[scoreNumber] = Integer.getInteger(currentScore);
-                currentScore = "";
-                scoreNumber++;
-            }
-            else
-            {
-                currentScore = currentScore + scoreString.charAt(i);
-            }
-        }
-
-        Log.v("reading", "Number of scores found = " + scoreNumber);
     }
 
     public void checkCollisions()

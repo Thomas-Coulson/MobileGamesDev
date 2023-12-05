@@ -20,11 +20,23 @@
         android:id="@+id/backButton"
         android:layout_width="156dp"
         android:layout_height="66dp"
-        android:layout_marginTop="612dp"
+        android:layout_marginTop="648dp"
         android:onClick="onTouchBack"
         android:text="Back"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.062"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/resetButton"
+        android:layout_width="156dp"
+        android:layout_height="66dp"
+        android:layout_marginTop="648dp"
+        android:onClick="onTouchReset"
+        android:text="Reset"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.937"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
