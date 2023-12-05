@@ -41,6 +41,7 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap bgSprite4;
     private Bitmap bgSprite5;
     private Bitmap bgSprite6;
+    private Bitmap gameOverSprite;
 
     private Bitmap coinSprite;
     private int coinX = 0;
@@ -248,6 +249,9 @@ public class GameView extends SurfaceView implements Runnable
         bgSprite6 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg6);
         bgSprite6 = Bitmap.createScaledBitmap(bgSprite6, screenWidth, screenHeight, false);
         levelBackgrounds[5] = bgSprite6;
+
+        gameOverSprite = BitmapFactory.decodeResource(getResources(), R.drawable.gameoverbg);
+        gameOverSprite = Bitmap.createScaledBitmap(gameOverSprite, screenWidth, screenHeight, false);
 
         coinSprite = BitmapFactory.decodeResource(getResources(), R.drawable.coin);
 
@@ -802,27 +806,30 @@ public class GameView extends SurfaceView implements Runnable
 
     public void drawGameOverrUI(Canvas canvas)
     {
-        Paint uiTextPaint = new Paint();
-        uiTextPaint.setColor(Color.WHITE);
-        uiTextPaint.setTextSize(60);
-        canvas.drawText("GAME OVER", 50, 100, uiTextPaint);
+//        Paint uiTextPaint = new Paint();
+//        uiTextPaint.setColor(Color.WHITE);
+//        uiTextPaint.setTextSize(60);
+//        canvas.drawText("GAME OVER", 50, 100, uiTextPaint);
+
+        canvas.drawBitmap(gameOverSprite, 0, 0, null);
 
         drawScoreMultiplierUI(canvas);
 
-        //Log.v("Paint", "Can restart = " + canRestart);
         if(canRestart)
         {
-            //Log.v("Paint", "Painting reset go messages");
-
             Paint uiSwipeUpTextPaint = new Paint();
             uiSwipeUpTextPaint.setColor(Color.WHITE);
             uiSwipeUpTextPaint.setTextSize(50);
-            canvas.drawText("Swipe up to restart", 50, 1300, uiSwipeUpTextPaint);
+            canvas.drawText("up", 80, 1280, uiSwipeUpTextPaint);
+            canvas.drawText("       -", 30, 1340, uiSwipeUpTextPaint);
+            canvas.drawText("restart", 50, 1400, uiSwipeUpTextPaint);
 
             Paint uiTextSwipeDownPaint = new Paint();
             uiTextSwipeDownPaint.setColor(Color.WHITE);
-            uiTextSwipeDownPaint.setTextSize(50);
-            canvas.drawText("Swipe down for Title Screen", 50, 1400, uiTextSwipeDownPaint);
+            uiTextSwipeDownPaint.setTextSize(30);
+            canvas.drawText("Down", 520, 1280, uiSwipeUpTextPaint);
+            canvas.drawText("       -", 500, 1340, uiSwipeUpTextPaint);
+            canvas.drawText("Menu", 520, 1400, uiSwipeUpTextPaint);
         }
 
     }
@@ -832,33 +839,33 @@ public class GameView extends SurfaceView implements Runnable
         Paint uiScoreTotalPaint = new Paint();
         uiScoreTotalPaint.setColor(Color.WHITE);
         uiScoreTotalPaint.setTextSize(75);
-        canvas.drawText("Total:", 250, 750, uiScoreTotalPaint);
+        canvas.drawText("Total:", 260, 800, uiScoreTotalPaint);
 
         if(showScoreLine1)
         {
             Paint uiScoreRoomsPaint = new Paint();
             uiScoreRoomsPaint.setColor(Color.WHITE);
             uiScoreRoomsPaint.setTextSize(50);
-            canvas.drawText("Rooms Completed = " + completedLevels, 50, 300, uiScoreRoomsPaint);
+            canvas.drawText("Rooms = " + completedLevels, 150, 400, uiScoreRoomsPaint);
         }
         if(showScoreLine2)
         {
             Paint uiScoreTotalCoinsPaint = new Paint();
             uiScoreTotalCoinsPaint.setColor(Color.WHITE);
             uiScoreTotalCoinsPaint.setTextSize(50);
-            canvas.drawText("Total Coins Collected = " + totalCoins, 50, 400, uiScoreTotalCoinsPaint);
+            canvas.drawText("Total Coins = " + totalCoins, 150, 500, uiScoreTotalCoinsPaint);
         }
         if(showScoreLine3)
         {
             Paint uiScoreCurrentCoinsPaint = new Paint();
             uiScoreCurrentCoinsPaint.setColor(Color.WHITE);
             uiScoreCurrentCoinsPaint.setTextSize(50);
-            canvas.drawText("Current Coins = " + currentCoins, 50, 500, uiScoreCurrentCoinsPaint);
+            canvas.drawText("Current Coins = " + currentCoins, 150, 600, uiScoreCurrentCoinsPaint);
         }
         if(showScoreLine4)
         {
-            canvas.drawText(completedLevels + " + " + totalCoins + " + " + currentCoins, 175, 880, uiScoreTotalPaint);
-            canvas.drawText("-" + finalScore + "-", 275, 1010, uiScoreTotalPaint);
+            canvas.drawText(completedLevels + " + " + totalCoins + " + " + currentCoins, 200, 930, uiScoreTotalPaint);
+            canvas.drawText("-  " + finalScore + "  -", 260, 1060, uiScoreTotalPaint);
 
         }
     }
