@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#1C1117"
+    android:background="#222222"
     tools:context=".MainActivity">
 
     <ImageView
@@ -22,7 +22,7 @@
         android:id="@+id/startButton"
         android:layout_width="259dp"
         android:layout_height="86dp"
-        android:layout_marginTop="332dp"
+        android:layout_marginTop="356dp"
         android:alpha="255"
         android:backgroundTint="#4CAF50"
         android:foreground="@drawable/startbutton"
@@ -39,9 +39,10 @@
         android:id="@+id/scoresButton"
         android:layout_width="251dp"
         android:layout_height="69dp"
-        android:layout_marginTop="460dp"
+        android:layout_marginTop="504dp"
         android:background="#4CAF50"
         android:backgroundTint="#4CAF50"
+        android:foreground="@drawable/scoresbutton"
         android:onClick="onTouchScores"
         android:text="Scores"
         android:textAlignment="center"
@@ -49,7 +50,7 @@
         android:textSize="34sp"
         app:iconTint="#4CAF50"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.525"
+        app:layout_constraintHorizontal_bias="0.52"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
