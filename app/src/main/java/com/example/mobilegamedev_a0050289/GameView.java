@@ -41,6 +41,10 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap bgSprite4;
     private Bitmap bgSprite5;
     private Bitmap bgSprite6;
+    private Bitmap bgSprite7;
+    private Bitmap bgSprite8;
+    private Bitmap bgSprite9;
+    private Bitmap bgSprite10;
     private Bitmap gameOverSprite;
 
     private Bitmap coinSprite;
@@ -57,7 +61,7 @@ public class GameView extends SurfaceView implements Runnable
     private int playerBaseSpeed = 700;
     private int playerBoostedSpeed = 1200;
 
-    private int numberOfLevels = 6;
+    private int numberOfLevels = 10;
     private Bitmap[] levelBackgrounds = new Bitmap[numberOfLevels];//stores all level images
     private int[] levelFileIds = new int[numberOfLevels];
     private int[] visitedLevels = new int[numberOfLevels];//filled with 0s by default, so will always start with level0;
@@ -118,6 +122,10 @@ public class GameView extends SurfaceView implements Runnable
         levelFileIds[3] = R.raw.level4;
         levelFileIds[4] = R.raw.level5;
         levelFileIds[5] = R.raw.level6;
+        levelFileIds[6] = R.raw.level7;
+        levelFileIds[7] = R.raw.level8;
+        levelFileIds[8] = R.raw.level9;
+        levelFileIds[9] = R.raw.level10;
 
         loadSprites();
 
@@ -249,6 +257,22 @@ public class GameView extends SurfaceView implements Runnable
         bgSprite6 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg6);
         bgSprite6 = Bitmap.createScaledBitmap(bgSprite6, screenWidth, screenHeight, false);
         levelBackgrounds[5] = bgSprite6;
+
+        bgSprite7 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg7);
+        bgSprite7 = Bitmap.createScaledBitmap(bgSprite7, screenWidth, screenHeight, false);
+        levelBackgrounds[6] = bgSprite7;
+
+        bgSprite8 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg8);
+        bgSprite8 = Bitmap.createScaledBitmap(bgSprite8, screenWidth, screenHeight, false);
+        levelBackgrounds[7] = bgSprite8;
+
+        bgSprite9 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg9);
+        bgSprite9 = Bitmap.createScaledBitmap(bgSprite9, screenWidth, screenHeight, false);
+        levelBackgrounds[8] = bgSprite9;
+
+        bgSprite10 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg10);
+        bgSprite10 = Bitmap.createScaledBitmap(bgSprite10, screenWidth, screenHeight, false);
+        levelBackgrounds[9] = bgSprite10;
 
         gameOverSprite = BitmapFactory.decodeResource(getResources(), R.drawable.gameoverbg);
         gameOverSprite = Bitmap.createScaledBitmap(gameOverSprite, screenWidth, screenHeight, false);
