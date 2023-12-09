@@ -3,6 +3,7 @@ package com.example.mobilegamedev_a0050289;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
@@ -22,6 +23,8 @@ public class ScoresActivity extends AppCompatActivity{
     TextView score3View;
     TextView score4View;
     TextView score5View;
+
+    MediaPlayer mp;
 
     SharedPreferences sharedPref;
 
@@ -58,21 +61,28 @@ public class ScoresActivity extends AppCompatActivity{
         score4View.setText(Integer.toString(highscore4));
         score5View.setText(Integer.toString(highscore5));
 
+        mp = MediaPlayer.create(this, R.raw.selectsound);
     }
 
     public void onTouchBack(View view)
     {
+        //play select sound
+        mp.start();
         finish();
     }
 
     public void onTouchReset(View view)
-    {        SharedPreferences.Editor editor = sharedPref.edit();
-             editor.putInt("highscore1_key", 0);
-             editor.putInt("highscore2_key", 0);
-             editor.putInt("highscore3_key", 0);
-             editor.putInt("highscore4_key", 0);
-             editor.putInt("highscore5_key", 0);
-             editor.apply();
+    {
+        //play select sound
+        mp.start();
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("highscore1_key", 0);
+        editor.putInt("highscore2_key", 0);
+        editor.putInt("highscore3_key", 0);
+        editor.putInt("highscore4_key", 0);
+        editor.putInt("highscore5_key", 0);
+        editor.apply();
 
         int defaultValue = 0;
         int highscore1 = sharedPref.getInt("highscore1_key", defaultValue);

@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -28,6 +29,7 @@ import java.util.Timer;
 public class GameView extends SurfaceView implements Runnable
 {
     private Thread gameThread;
+    private Context currentContext;
     private SurfaceHolder surfaceHolder;
     private volatile boolean playing;
     private Canvas canvas;
@@ -46,6 +48,7 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap bgSprite9;
     private Bitmap bgSprite10;
     private Bitmap gameOverSprite;
+    private Bitmap powerupSprite;
 
     private Bitmap coinSprite;
     private int coinX = 0;
@@ -107,6 +110,8 @@ public class GameView extends SurfaceView implements Runnable
 
     private SharedPreferences sharedPref;
 
+    private MediaPlayer bgMediaPlayer;
+
     private boolean gameOver = false;
     private boolean canRestart = false;
     private GameActivity gameActivity;
@@ -114,6 +119,13 @@ public class GameView extends SurfaceView implements Runnable
     public GameView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         surfaceHolder = getHolder();
+        currentContext = context;
+
+        //set up background music
+        bgMediaPlayer = MediaPlayer.create(context, R.raw.backgroundmusic);
+        if(!bgMediaPlayer.isLooping())
+            bgMediaPlayer.setLooping(true);
+        bgMediaPlayer.setVolume(0.5f, 0.5f);
 
         //save levelFileIds
         levelFileIds[0] = R.raw.level1;
@@ -129,7 +141,7 @@ public class GameView extends SurfaceView implements Runnable
 
         loadSprites();
 
-        //set all values of visited levels to 999 (because 0 counts a s a level id to check and 999 doesnt)
+        //set all values of visited levels to 999 (because 0 counts as a level id to check and 999 doesnt)
         for(int i = 0; i < visitedLevels.length; i++)
         {
             visitedLevels[i] = 999;
@@ -150,17 +162,20 @@ public class GameView extends SurfaceView implements Runnable
 
         player = new Player(playerSpriteRight, playerSpriteLeft);
         player.setPosition(playerStartPosX, playerStartPosY);
-        coinIcon = new Coin(510, 25, coinSprite, false);//coin sprite for UI
+        coinIcon = new Coin(context, 510, 25, coinSprite, false);//coin sprite for UI
         coinIcon.SetVisible(true);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        //start bg music
+        bgMediaPlayer.start();
     }
 
     public void loadLevel() throws IOException
     {
         for(int i = 0; i < maxLevelCoins; i++)
         {
-            levelCoins[i] = new Coin(0, 0, coinSprite, true);
+            levelCoins[i] = new Coin(currentContext, 0, 0, coinSprite, true);
         }
 
         //read level from file
@@ -195,7 +210,7 @@ public class GameView extends SurfaceView implements Runnable
         {
             for(int x = 0; x < gridX; x++)
             {
-                //Contruct level based on loaded file.
+                //Construct level based on loaded file.
                 NodeType nodeType = NodeType.none;
                 if(levelString.charAt(levelStringIndex) == 'X')
                 {
@@ -279,6 +294,8 @@ public class GameView extends SurfaceView implements Runnable
 
         coinSprite = BitmapFactory.decodeResource(getResources(), R.drawable.coin);
 
+        powerupSprite = BitmapFactory.decodeResource(getResources(), R.drawable.speedboost);
+        powerupSprite = Bitmap.createScaledBitmap(powerupSprite, 540, 90, false);
     }
 
     @Override
@@ -290,8 +307,6 @@ public class GameView extends SurfaceView implements Runnable
 
             if(elapsedLevelTime >= levelStartTime*1000)
             {
-                //Log.v("Timer", "Level Time is up");
-                //Log.v("Timer", "gameOver = " + gameOver);
                 if(gameOver == false)
                 {
                     finalScore = completedLevels + totalCoins + currentCoins;
@@ -300,9 +315,11 @@ public class GameView extends SurfaceView implements Runnable
                 gameOver = true;
 
             }
-            //Log.v("Timer", "CanRestart = " + canRestart);
             if(gameOver && !canRestart)
             {
+                //stop level music
+                bgMediaPlayer.pause();
+
                 //incrementally show score multipliers
                 if(elapsedGameOverTime >= scoreLine1Delay*1000)
                 {
@@ -352,7 +369,6 @@ public class GameView extends SurfaceView implements Runnable
                                     {
                                         //add current high score
                                         highscores[scoreIdx] = finalScore;
-                                        //break;
                                     }
                                 }
                                 break;
@@ -399,7 +415,6 @@ public class GameView extends SurfaceView implements Runnable
         {
             //essentially pause game here
             player.setMoveDirection(MoveDirection.Stopped);
-            //Log.v("Timer", "Updating elsapsed gameover time");
             elapsedGameOverTime = (new Date()).getTime() - startGameOverTime;
         }
         else if(!gameOver)
@@ -696,7 +711,7 @@ public class GameView extends SurfaceView implements Runnable
 
     public void addCoinTime()
     {
-        //check if I need to add coin time
+        //check if this needs to add coin time
         if(totalCoins % 5 == 0)
         {
             startTime = startTime + (coinTimeAddition * 1000);
@@ -706,7 +721,9 @@ public class GameView extends SurfaceView implements Runnable
     public void resetGame()
     {
         currentLevelIndex = 0;
+
         //empty visited list when randomisising levels
+        visitedLevels = new int[numberOfLevels];
 
         stopSpeedBoost();
 
@@ -734,6 +751,8 @@ public class GameView extends SurfaceView implements Runnable
 
         finalScore = 0;
 
+        bgMediaPlayer.start();
+
         gameOver = false;
         canRestart = false;
     }
@@ -745,7 +764,6 @@ public class GameView extends SurfaceView implements Runnable
             canvas = surfaceHolder.lockCanvas();
 
             //(Clear bg)
-
             canvas.drawColor(Color.BLACK);
 
             if(!gameOver)
@@ -785,7 +803,6 @@ public class GameView extends SurfaceView implements Runnable
     {
         long timerValue = levelStartTime - (elapsedLevelTime / 1000);
 
-        //draw UI
         Paint uiTRectPaint = new Paint();
         uiTRectPaint.setColor(Color.WHITE);
         canvas.drawRect(0, 0, 225, 155, uiTRectPaint);
@@ -804,7 +821,6 @@ public class GameView extends SurfaceView implements Runnable
 
     public void drawCoinUI(Canvas canvas)
     {
-        //draw UI
         Paint uiTRectPaint = new Paint();
         uiTRectPaint.setColor(Color.WHITE);
         canvas.drawRect(495, 0, 720, 155, uiTRectPaint);
@@ -822,19 +838,11 @@ public class GameView extends SurfaceView implements Runnable
 
     public void drawShakeUI(Canvas canvas)
     {
-        Paint uiTextPaint = new Paint();
-        uiTextPaint.setColor(Color.WHITE);
-        uiTextPaint.setTextSize(60);
-        canvas.drawText("-SHAKE-", 500, 220, uiTextPaint);
+        canvas.drawBitmap(powerupSprite, 90, 1320, null);
     }
 
     public void drawGameOverrUI(Canvas canvas)
     {
-//        Paint uiTextPaint = new Paint();
-//        uiTextPaint.setColor(Color.WHITE);
-//        uiTextPaint.setTextSize(60);
-//        canvas.drawText("GAME OVER", 50, 100, uiTextPaint);
-
         canvas.drawBitmap(gameOverSprite, 0, 0, null);
 
         drawScoreMultiplierUI(canvas);
@@ -900,7 +908,6 @@ public class GameView extends SurfaceView implements Runnable
         try {
             gameThread.join();
         } catch (InterruptedException e) {
-            Log.e("GameView", "Interrupted");
         }
     }
 

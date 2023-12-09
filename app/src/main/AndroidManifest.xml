@@ -25,7 +25,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".GameActivity"/>
-        <activity android:name=".EndScreenActivity"/>
         <activity android:name=".ScoresActivity"/>
     </application>
 

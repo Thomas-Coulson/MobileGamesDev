@@ -1,15 +1,15 @@
 package com.example.mobilegamedev_a0050289;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.media.MediaPlayer;
 import android.util.Log;
 
 public class Coin {
-
-    //private boolean pickedUp = false;
     private boolean visible = false;
     private boolean animated = false;
     private int xPos = 0, yPos = 0;
@@ -25,7 +25,9 @@ public class Coin {
 
     private RectF Hitbox = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
 
-    public Coin(int xpos, int ypos, Bitmap coinSprite, boolean isAnimated)
+    private MediaPlayer coinMediaPlayer;
+
+    public Coin(Context context, int xpos, int ypos, Bitmap coinSprite, boolean isAnimated)
     {
         sprite = Bitmap.createScaledBitmap(coinSprite, frameW * frameCount, frameH, false);
         xPos = xpos;
@@ -33,6 +35,16 @@ public class Coin {
         animated = isAnimated;
         Hitbox = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
         whereToDraw = new RectF(xPos, yPos, xPos + frameW, yPos + frameH);
+
+        //set up coin sound
+        coinMediaPlayer = MediaPlayer.create(context, R.raw.coinsound);
+        coinMediaPlayer.setVolume(0.5f, 0.5f);
+        coinMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                coinMediaPlayer.release();
+            }
+        });
     }
 
     protected void manageCurrentFrame()
@@ -70,7 +82,15 @@ public class Coin {
 
     public RectF GetHitBox(){return Hitbox;}
     public boolean GetVisible(){return visible;}
-    public void SetVisible(boolean Visible){visible = Visible;}
+    public void SetVisible(boolean Visible)
+    {
+        if(!Visible)
+        {
+            //must be collecting this coin
+            coinMediaPlayer.start();
+        }
+        visible = Visible;
+    }
 
     public void SetNewPosition(int x, int y)
     {
