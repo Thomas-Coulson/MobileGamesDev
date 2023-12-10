@@ -175,6 +175,9 @@ public class GameView extends SurfaceView implements Runnable
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 
+        //start level timer
+        startTime = System.currentTimeMillis();
+
         //start bg music
         bgMediaPlayer.start();
     }
