@@ -47,6 +47,10 @@ public class GameView extends SurfaceView implements Runnable
     private Bitmap bgSprite8;
     private Bitmap bgSprite9;
     private Bitmap bgSprite10;
+    private Bitmap bgSprite11;
+    private Bitmap bgSprite12;
+    private Bitmap bgSprite13;
+    private Bitmap bgSprite14;
     private Bitmap gameOverSprite;
     private Bitmap powerupSprite;
 
@@ -64,7 +68,7 @@ public class GameView extends SurfaceView implements Runnable
     private int playerBaseSpeed = 700;
     private int playerBoostedSpeed = 1200;
 
-    private int numberOfLevels = 10;
+    private int numberOfLevels = 14;
     private Bitmap[] levelBackgrounds = new Bitmap[numberOfLevels];//stores all level images
     private int[] levelFileIds = new int[numberOfLevels];
     private int[] visitedLevels = new int[numberOfLevels];//filled with 0s by default, so will always start with level0;
@@ -83,7 +87,7 @@ public class GameView extends SurfaceView implements Runnable
     private long startTime = System.currentTimeMillis();
     private int levelStartTime = 30;//seconds
     private long elapsedLevelTime = 0;
-    private int coinTimeAddition = 10;//seconds
+    private int coinTimeAddition = 8;//seconds
 
     private long startPowerupTime;
     private long elapsedPowerupTime = 0;
@@ -138,6 +142,10 @@ public class GameView extends SurfaceView implements Runnable
         levelFileIds[7] = R.raw.level8;
         levelFileIds[8] = R.raw.level9;
         levelFileIds[9] = R.raw.level10;
+        levelFileIds[10] = R.raw.level11;
+        levelFileIds[11] = R.raw.level12;
+        levelFileIds[12] = R.raw.level13;
+        levelFileIds[13] = R.raw.level14;
 
         loadSprites();
 
@@ -288,6 +296,22 @@ public class GameView extends SurfaceView implements Runnable
         bgSprite10 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg10);
         bgSprite10 = Bitmap.createScaledBitmap(bgSprite10, screenWidth, screenHeight, false);
         levelBackgrounds[9] = bgSprite10;
+
+        bgSprite11 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg11);
+        bgSprite11 = Bitmap.createScaledBitmap(bgSprite11, screenWidth, screenHeight, false);
+        levelBackgrounds[10] = bgSprite11;
+
+        bgSprite12 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg12);
+        bgSprite12 = Bitmap.createScaledBitmap(bgSprite12, screenWidth, screenHeight, false);
+        levelBackgrounds[11] = bgSprite12;
+
+        bgSprite13 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg13);
+        bgSprite13 = Bitmap.createScaledBitmap(bgSprite13, screenWidth, screenHeight, false);
+        levelBackgrounds[12] = bgSprite13;
+
+        bgSprite14 = BitmapFactory.decodeResource(getResources(), R.drawable.levelbg14);
+        bgSprite14 = Bitmap.createScaledBitmap(bgSprite14, screenWidth, screenHeight, false);
+        levelBackgrounds[13] = bgSprite14;
 
         gameOverSprite = BitmapFactory.decodeResource(getResources(), R.drawable.gameoverbg);
         gameOverSprite = Bitmap.createScaledBitmap(gameOverSprite, screenWidth, screenHeight, false);
@@ -676,6 +700,7 @@ public class GameView extends SurfaceView implements Runnable
         }
 
         player.setPosition(playerStartPosX, playerStartPosY);
+        player.setMoveDirection(MoveDirection.Stopped);
     }
 
     public void setGameActivity(GameActivity currentGameActivity){gameActivity = currentGameActivity;}

@@ -72,9 +72,9 @@ public class Player
                 //move left
                 xPos = xPos - speed / fps;
                 currentSprite = playerSpriteL;
-                if(xPos < 0)
+                if(xPos + frameW < 0)
                 {
-                    xPos = gameView.getWidth() - frameW;
+                    xPos = gameView.getWidth();
                 }
                 break;
             default:
